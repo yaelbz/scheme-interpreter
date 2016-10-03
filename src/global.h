@@ -64,4 +64,8 @@ struct ybObject {
 };
 
 
+
+void ybError(int, const char *, ...);
+
+
 #endif /* GLOBAL_H_ */

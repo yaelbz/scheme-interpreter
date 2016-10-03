@@ -4,18 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../src/global.c \
 ../src/printer.c \
 ../src/reader.c \
 ../src/selftest.c \
 ../src/ybscheme.c 
 
 OBJS += \
+./src/global.o \
 ./src/printer.o \
 ./src/reader.o \
 ./src/selftest.o \
 ./src/ybscheme.o 
 
 C_DEPS += \
+./src/global.d \
 ./src/printer.d \
 ./src/reader.d \
 ./src/selftest.d \

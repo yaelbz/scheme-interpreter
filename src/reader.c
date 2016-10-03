@@ -18,6 +18,8 @@ OBJ ybRead(FILE*);
 
 static int pushedChar = -1;
 
+//--------------- helper functions ----------------------//
+
 bool isDigit(int ch){
 	return (ch>='0' && ch<='9');
 }
@@ -30,18 +32,19 @@ bool isWhitespace(int ch){
 	return (ch==' ' || ch=='\n' || ch=='\t' || ch=='\r');
 }
 
-bool isSymboInitialChar(int ch){
+bool isSymbolInitialChar(int ch){
 	//aus: http://www.scheme.com/tspl2d/grammar.html --> identifier
 	//<letter> | ! | $ | % | & | * | / | : | < | = | > | ? | ~ | _ | ^
+	// + | - | . --> prüfung auf Sonderfälle in ybReadSymbol
 	return (ch=='!' || ch=='$' || ch=='%' || ch=='&' || ch=='*' || ch=='/' ||
 			ch==':' || ch=='<' || ch=='=' || ch=='>' || ch=='?' || ch=='~' ||
-			ch=='^' || ch=='_' || isLetter(ch));
+			ch=='^' || ch=='_' || ch=='.' || ch=='+' || ch=='-' || isLetter(ch));
 }
 
-bool isSubsequentChar(int ch){
+bool isSymbolSubsequentChar(int ch){
 	//aus: http://www.scheme.com/tspl2d/grammar.html --> identifier
-	//<initial> | <digit> | . | + | -
-	return (isSymboInitialChar(ch) || isDigit(ch) || ch=='.' || ch=='+' || ch=='-');
+	//<initial> | <digit>
+	return (isSymbolInitialChar(ch) || isDigit(ch));
 }
 
 //--------------- get/push char ----------------------//
@@ -81,8 +84,7 @@ int getNextRelevantCharWithoutWhitespaces(FILE* inputStream){
 
 void pushCharBack(int ch){
 	if(pushedChar>=0){
-		printf("#### Error: pushedChar not empty\n");
-		exit(-1);
+		ybError(-1, "pushedChar not empty");
 	}
 	else{
 		pushedChar = ch;
@@ -220,32 +222,39 @@ OBJ ybReadString(FILE* inputStream){
 /******************
  * read symbol
  ******************/
-OBJ ybReadSymbol(FILE* inputStream, int firstCh){
+OBJ ybReadSymbol(FILE* inputStream){
 	OBJ obj;
 	char val[100];
 	char *p = val;
 
 	//check first char
-	if(!isSymboInitialChar(firstCh)){
-		printf("#### syntax error: not valid symbol");
-		//todo was soll hier nach dem Error passieren? Soll das Programm abbrechen oder irgnedwie weiterlaufen?
+	int ch = getNextRelevantChar(inputStream);
+	if(!isSymbolInitialChar(ch)){
+		ybError(-1, "syntax error: not valid symbol");
 	}
-	*p=firstCh;
+	*p=ch;
 	p++;
-
-	//check if not a single period
-	//evtl erst prüfen wenn das ganze symbol eingelesen wurde
-	int ch=getNextRelevantChar(inputStream);
 
 //printf("#### ybReadSymbol: %c\n", isWhitespace(firstCh)?'_':firstCh); fflush(stdout);
 
-	while(isSubsequentChar(ch)){
+	//check the following chars
+	ch=getNextRelevantChar(inputStream);
+	while(isSymbolSubsequentChar(ch)){
 		*p=ch;
 		p++;
 		ch=getNextRelevantChar(inputStream);
 	}
 	*p='\0'; //damit klar ist wann der string zuende ist
 	pushCharBack(ch);
+
+	//sonderfälle prüfen: + - ...
+	if((val[0]=='+' || val[0]=='-') && val[1]!='\0'){
+		//fehlermeldung, da beginnt nämlich ein symbol mit + oder -
+		ybError(-1, "syntax error: not a symbol");
+		//abbruch
+
+		//todo auch auf ... prüfen
+	}
 
 	obj = newSymbol(val);
 	//free() mit dem angelegten Speicher als parameter
@@ -269,17 +278,33 @@ OBJ ybRead(FILE* inputStream){
 		return ybReadList(inputStream);
 	}
 
-	//Zahl
-	if(isDigit(ch)){
-		return ybReadInt(inputStream, ch);
-	}
-
 	//String
 	if(ch=='"'){
 		return ybReadString(inputStream);
 	}
 
+	//todo implementieren:
+	/*
+	if(ch=='+' || ch=='-' || ch=='.'){
+		int secondCh = getNextRelevantChar(inputStream);
+		if(isDigit(secondCh)){
+			pushCharBack(ch, secondCh); //beide Zeichen zurücklegen!!!
+			return ybReadNumber(inputStream); //in ybReadInt umbenennen in ybReadNumber und dort die zurückgelegte Zeichen auslesen
+		}
+		else{
+			pushCharBack(ch, secondCh); //beide Zeichen zurücklegen!!!
+			return ybReadSymbol(inputStream); //dort die Zeichen wieder auslesen und weiterprüfen
+		}
+	}
+	*/
+
+	//Zahl
+	if(isDigit(ch)){
+		return ybReadInt(inputStream, ch);
+	}
+
 	//"else" -> symbol
-	return ybReadSymbol(inputStream, ch);
+	pushCharBack(ch);
+	return ybReadSymbol(inputStream);
 
 }
