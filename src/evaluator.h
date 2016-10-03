@@ -8,6 +8,6 @@
 #ifndef EVALUATOR_H_
 #define EVALUATOR_H_
 
-
+OBJ ybEval(OBJ);
 
 #endif /* EVALUATOR_H_ */

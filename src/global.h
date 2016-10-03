@@ -13,7 +13,8 @@
 //--- types of objects ---//
 
 typedef enum {
-	T_NIL,
+	T_ERROR=-1,
+	T_NIL=0,
 	T_INT,
 	T_STRING,
 	T_SYMBOL,
@@ -28,6 +29,11 @@ struct ybAny {
 	objType type;
 };
 
+struct ybError {
+	objType type;
+	char *message;
+};
+
 struct ybInt {
 	objType type;
 	int value;
@@ -38,7 +44,6 @@ struct ybSymbol {
 	char *name;
 };
 
-//kommt irgendwann wieder weg, bzw wird anders
 struct ybString {
 	objType type;
 	char *string;
@@ -55,17 +60,29 @@ struct ybCons {
 
 struct ybObject {
 	union {
-		struct ybAny any;
-		struct ybInt integer;
+		struct ybAny    any;
+		struct ybError  error;
+		struct ybInt    integer;
 		struct ybString string;
 		struct ybSymbol symbol;
-		struct ybCons cons;
+		struct ybCons   cons;
 	} u;
 };
 
+// prototypen
+OBJ newYbNil();
+OBJ newYbError(char *);
+OBJ newYbInteger(long);
+OBJ newYbString(char *);
+OBJ newYbSymbol(char *);
+OBJ newYbCons(OBJ, OBJ);
 
 
-void ybError(int, const char *, ...);
+
+void ybThrowError(int, const char *, ...);
+
+
+
 
 
 #endif /* GLOBAL_H_ */

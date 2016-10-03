@@ -84,65 +84,13 @@ int getNextRelevantCharWithoutWhitespaces(FILE* inputStream){
 
 void pushCharBack(int ch){
 	if(pushedChar>=0){
-		ybError(-1, "pushedChar not empty");
+		ybThrowError(-1, "pushedChar not empty");
 	}
 	else{
 		pushedChar = ch;
 	}
 }
 
-//--------------- object constructor - evtl auslagern in datei ----------------------//
-//TODO Objekte anlegen (malloc)
-
-/******************
- * von gittinger übernommen (er hats in memory.c)
- * habs etwas an meinen code angepasst
- * ?? ist es sinnvoll ein memory.c zu haben? oder lieber irgendwie anders?
- ******************/
-OBJ newInteger(long iVal) {
-	struct ybInt *obj;
-
-	obj = (struct ybInt *)(malloc( sizeof(struct ybInt)));
-	obj->type = T_INT;
-	obj->value = iVal;
-	return (OBJ)obj;
-}
-
-OBJ newString(char *val){
-	struct ybString *obj;
-	/*/*
-	 * NewString sollte aber trotzdem strcpy verwenden
-	 * Um den wert zu kopieren (der übergeben wird)
-	 * Wenn in [] nichts drin steht, ist es dasselbe wie char*,
-	 * dann ist kein speicher reserviert und muss erst mit malloc angelegt werden
-	 */
-	obj = (struct ybString *)(malloc( sizeof(struct ybString)));
-	obj->type = T_STRING;
-	obj->string = (char *)(malloc( strlen(val)));
-	strcpy(obj->string, val);
-	return (OBJ)obj;
-}
-
-OBJ newSymbol(char *val){
-	struct ybSymbol *obj;
-	//siehe anmerkung in newString()
-	obj = (struct ybSymbol *)(malloc( sizeof(struct ybSymbol)));
-	obj->type = T_SYMBOL;
-	obj->name = (char *)(malloc( strlen(val)));
-	strcpy(obj->name, val);
-	return (OBJ)obj;
-}
-
-OBJ newCons(OBJ car, OBJ cdr){
-	struct ybCons *obj;
-	obj = (struct ybCons *)(malloc(sizeof(struct ybCons)));
-	obj->type=T_CONS;
-	obj->first = car;
-	obj->rest = cdr;
-	return (OBJ)obj;
-}
-
-//--------------- read functions ----------------------//
 
 /******************
  * read list
@@ -151,7 +99,7 @@ OBJ newCons(OBJ car, OBJ cdr){
 OBJ ybReadList(FILE* inputStream){
 	int ch = getNextRelevantCharWithoutWhitespaces(inputStream);
 	if(ch==')'){
-		return NULL; //abbruch. besser nicht NULL nehmen, sondern eigenes Zeichen das das Ende der Liste symbolisiert. Damit der Eval das Ende findet
+		return newYbNil();
 	}
 
 	pushCharBack(ch);
@@ -159,7 +107,7 @@ OBJ ybReadList(FILE* inputStream){
 	OBJ first = ybRead(inputStream);
 	OBJ rest = ybReadList(inputStream);
 
-	return newCons(first, rest);
+	return newYbCons(first, rest);
 }
 
 
@@ -176,11 +124,11 @@ OBJ ybReadInt(FILE* inputStream, int firstDigit){
 	if(!isDigit(ch)){
 		//evtl unreadChar() ??? Das zeichen wird ja später nochmal gebraucht
 		//todo hier muss auch abgebrochen werden wenn ein leerzeichen gekommen ist (von getNextRelevantChar), es könnten ja zwei zahlen hintereinander kommen, zb 1 2, wenn da das leerzeichen ignoriert wird wirds ja ne 12
-		return NULL; //abbruch TODO weiß nicht wie genau das laufen soll (auch bei der anderen fkt)
+		return newYbNil();
 	}
 	if(isWhitespace(ch)){
 		//kein unreadChar
-		return NULL;
+		return newYbNil();
 	}*/
 
 	//gittinger:
@@ -191,7 +139,7 @@ OBJ ybReadInt(FILE* inputStream, int firstDigit){
 		}
 		pushCharBack(ch);
 
-		obj = newInteger(val);
+		obj = newYbInteger(val);
 
 	return obj;
 }
@@ -214,7 +162,7 @@ OBJ ybReadString(FILE* inputStream){
 		ch=getNextRelevantChar(inputStream);
 	}
 	*p='\0'; //damit klar ist wann der string zuende ist
-	obj = newString(val);
+	obj = newYbString(val);
 	//free() mit dem angelegten Speicher als parameter
 	return obj;
 }
@@ -230,7 +178,8 @@ OBJ ybReadSymbol(FILE* inputStream){
 	//check first char
 	int ch = getNextRelevantChar(inputStream);
 	if(!isSymbolInitialChar(ch)){
-		ybError(-1, "syntax error: not valid symbol");
+		return newYbError("syntax error: not a valid symbol");
+		//ybThrowError(-1, "syntax error: not valid symbol");
 	}
 	*p=ch;
 	p++;
@@ -250,13 +199,13 @@ OBJ ybReadSymbol(FILE* inputStream){
 	//sonderfälle prüfen: + - ...
 	if((val[0]=='+' || val[0]=='-') && val[1]!='\0'){
 		//fehlermeldung, da beginnt nämlich ein symbol mit + oder -
-		ybError(-1, "syntax error: not a symbol");
-		//abbruch
+		return newYbError("syntax error: not a valid symbol");
+		//ybThrowError(-1, "syntax error: not a symbol");
 
 		//todo auch auf ... prüfen
 	}
 
-	obj = newSymbol(val);
+	obj = newYbSymbol(val);
 	//free() mit dem angelegten Speicher als parameter
 	return obj;
 }

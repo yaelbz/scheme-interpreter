@@ -38,74 +38,6 @@ cons
 
 
 
-/*
-// under construction
-void ybPrintIndent(char* prefix, const char* prefix2, OBJ obj) {
-
-	if(obj){
-		//TODO der zugang zu den Objekt-tags könnte über ein Makro kürzer werden.
-		switch (obj->u.any.type) {
-		case T_NIL:
-			printf("%s%snil\n", prefix, prefix2);
-			break;
-		case T_INT:
-			printf("%s%sint(%d)\n", prefix, prefix2, obj->u.integer.value);
-			break;
-		case T_STRING:
-			printf("%s%sstring(%s)\n", prefix, prefix2, obj->u.string.string);
-			break;
-		case T_SYMBOL:
-			printf("%s%ssymbol(%s)\n", prefix, prefix2, obj->u.symbol.name);
-			break;
-		case T_CONS: {
-			printf("%s%scons\n", prefix, prefix2);
-			// Vorausschauen für Baumstruktur
-			char* newPrefix1 = (char*)malloc(sizeof(prefix)+sizeof(prefix2)+6);
-			char* newPrefixR = (char*)malloc(sizeof(prefix)+sizeof(prefix2)+6);
-			//strcat(newPrefix, prefix2);
-			if(obj->u.cons.first == NULL || obj->u.cons.first->u.any.type==T_CONS){
-				strcat(newPrefix1, prefix);
-				strcat(newPrefix1, "|  ");
-				ybPrintIndent(newPrefix1,    "+-", obj->u.cons.first);
-				strcat(newPrefixR, prefix);
-				strcat(newPrefixR, "   ");
-				ybPrintIndent(newPrefixR, "+-", obj->u.cons.rest);
-			} else {
-				strcat(newPrefix1, prefix);
-				strcat(newPrefix1, "   ");
-				ybPrintIndent(newPrefix1, "+-", obj->u.cons.first);
-				ybPrintIndent(newPrefix1, "+-", obj->u.cons.rest);
-			}
-			free(newPrefix1);
-			free(newPrefixR);
-			//ybPrintIndent(indentCount+3, "+-", obj->u.cons.first);
-			//ybPrintIndent(indentCount+3, "+-", obj->u.cons.rest);
-			//  (1 2 (3 4) 5 6)
-			break;
-		}
-		default:
-			printf("%s%s<unknown type>\n", prefix, prefix2);
-			break;
-		}
-	}
-	else{
-		printf("%s%sNULL  !!remove me!!\n", prefix, prefix2);
-	}
-
-	fflush(stdout);
-
-	// Dynamisch angelegten Speicher wieder freigeben
-	//free(indentString);
-
-}
-
-void ybPrint(OBJ obj) {
-	ybPrintIndent("", "", obj);
-}
-
-/*/
-
-
 
 void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 
@@ -117,6 +49,11 @@ void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 	if(obj){
 		//TODO der zugang zu den Objekt-tags könnte über ein Makro kürzer werden.
 		switch (obj->u.any.type) {
+		case T_ERROR:
+			printf("%s%serror(%s)\n", indentString, prefix, obj->u.error.message);
+			ybThrowError(1, obj->u.error.message);
+			//fprintf(stderr, "%s\n", obj->u.error.message);
+			break;
 		case T_NIL:
 			printf("%s%snil\n", indentString, prefix);
 			break;
@@ -153,7 +90,4 @@ void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 void ybPrint(OBJ obj) {
 	ybPrintIndent(0, "", obj);
 }
-// */
-
-
 
