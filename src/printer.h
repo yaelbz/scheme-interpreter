@@ -11,5 +11,6 @@
 #include "global.h"
 
 void ybPrint(OBJ);
+void ybPrintIndent(int, char*, OBJ);
 
 #endif /* PRINTER_H_ */

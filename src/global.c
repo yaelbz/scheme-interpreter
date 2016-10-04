@@ -81,6 +81,17 @@ OBJ newYbCons(OBJ car, OBJ cdr){
 	return (OBJ)obj;
 }
 
+OBJ newYbFctBuiltin(char *name, ybFctPtr implementation){
+	struct ybFctBuiltin *obj;
+	obj = (struct ybFctBuiltin *)(malloc(sizeof(struct ybFctBuiltin)));
+	obj->type=T_FCT_BUILTIN;
+	obj->name = name;
+	obj->impl = implementation;
+	return (OBJ)obj;
+}
+
+
+//--------------- Error ----------------------//
 
 //TODO: declare enum with errors in global header
 void ybThrowError(int ybErrNum, const char *format, ...) {

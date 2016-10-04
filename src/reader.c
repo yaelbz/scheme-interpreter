@@ -12,8 +12,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include "global.h"
-
-OBJ ybRead(FILE*);
+#include "reader.h"
+#include "symbolTable.h"
 
 
 static int pushedChar = -1;
@@ -90,6 +90,8 @@ void pushCharBack(int ch){
 		pushedChar = ch;
 	}
 }
+
+//--------------- read functions ----------------------//
 
 
 /******************
@@ -205,7 +207,7 @@ OBJ ybReadSymbol(FILE* inputStream){
 		//todo auch auf ... prüfen
 	}
 
-	obj = newYbSymbol(val);
+	obj = getOrAddFromSymbolTable(val);
 	//free() mit dem angelegten Speicher als parameter
 	return obj;
 }

@@ -19,9 +19,12 @@ int main(){
 
 	printf("Hallöle!\n");
 
+	initEval();
+
 	//repl
 	while(1){
 		printf("yscm> ");
+		fflush(stdout);
 		//read
 		OBJ readObj = ybRead(stdin);
 		//eval

@@ -18,12 +18,17 @@ typedef enum {
 	T_INT,
 	T_STRING,
 	T_SYMBOL,
-	T_CONS
+	T_CONS,
+	T_FCT_BUILTIN,
+	T_FCT_USER,
+	T_KEYWORD //zb. define, if, else...
 }objType;
 
 //--- object definitions ---//
 
 typedef struct ybObject *OBJ;
+typedef OBJ (*ybFctPtr)(int); //Function pointer
+
 
 struct ybAny {
 	objType type;
@@ -55,6 +60,12 @@ struct ybCons {
 	OBJ rest; //cdr
 };
 
+struct ybFctBuiltin {
+	objType type;
+	char *name;
+	ybFctPtr impl; //implementation
+};
+
 
 //--- general object ---//
 
@@ -66,6 +77,8 @@ struct ybObject {
 		struct ybString string;
 		struct ybSymbol symbol;
 		struct ybCons   cons;
+		struct ybFctBuiltin fctBuiltin;
+		//struct ybFctUser fctUser;
 	} u;
 };
 
@@ -76,6 +89,7 @@ OBJ newYbInteger(long);
 OBJ newYbString(char *);
 OBJ newYbSymbol(char *);
 OBJ newYbCons(OBJ, OBJ);
+OBJ newYbFctBuiltin(char *, ybFctPtr);
 
 
 

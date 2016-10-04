@@ -66,6 +66,9 @@ void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 		case T_SYMBOL:
 			printf("%s%ssymbol(%s)\n", indentString, prefix, obj->u.symbol.name);
 			break;
+		case T_FCT_BUILTIN:
+			printf("%s%sbuiltin(%s,0x%08x)\n", indentString, prefix, obj->u.fctBuiltin.name, (int)obj->u.fctBuiltin.impl);
+			break;
 		case T_CONS:
 			printf("%s%scons\n", indentString, prefix);
 			ybPrintIndent(indentCount+3, "+-", obj->u.cons.first);
