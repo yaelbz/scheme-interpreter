@@ -21,10 +21,10 @@
  *
  ******************/
 void initBuiltins(){
-	envAdd(getOrAddFromSymbolTable("+"), newYbFctBuiltin("+", &builtinPlus));
-	envAdd(getOrAddFromSymbolTable("-"), newYbFctBuiltin("-", &builtinPlus));
-	envAdd(getOrAddFromSymbolTable("*"), newYbFctBuiltin("*", &builtinPlus));
-	envAdd(getOrAddFromSymbolTable("/"), newYbFctBuiltin("/", &builtinPlus));
+	envAdd(addToSymbolTable("+"), newYbFctBuiltin("+", &builtinPlus));
+	envAdd(addToSymbolTable("-"), newYbFctBuiltin("-", &builtinMinus));
+	envAdd(addToSymbolTable("*"), newYbFctBuiltin("*", &builtinMultiplication));
+	envAdd(addToSymbolTable("/"), newYbFctBuiltin("/", &builtinDivision));
 }
 
 void initEval(){
@@ -37,7 +37,7 @@ void initEval(){
 //--------------- eval functions ----------------------//
 
 OBJ ybEvalSymbol(OBJ obj){
-	printf("eval --- ybEvalSymbol:\n");
+	//printf("eval --- ybEvalSymbol:\n");
 	OBJ evalObj = envGet(obj);
 	//wenn objekt gefunden
 	if(evalObj) return evalObj;
@@ -46,12 +46,9 @@ OBJ ybEvalSymbol(OBJ obj){
 }
 
 OBJ ybEvalCons(OBJ obj){
-	printf("eval --- ybEvalCons:\n");
-	ybPrintIndent(2, "f-", obj->u.cons.first);
-	ybPrintIndent(2, "r-", obj->u.cons.rest);
+	//printf("eval --- ybEvalCons:\n");
 	//first element als funktionslot abspeichern
 	OBJ evalFirst = ybEval(obj->u.cons.first);
-	ybPrintIndent(2, "e-", evalFirst);
 
 	//rest in ner schleife durchgehen
 	OBJ rest = obj->u.cons.rest;
@@ -71,8 +68,9 @@ OBJ ybEvalCons(OBJ obj){
 
 
 OBJ ybEval(OBJ obj){
-	printf("eval --- ybEval:\n");
-	switch(obj->u.any.type){
+	//printf("eval --- ybEval:\n");
+	//switch(obj->u.any.type){
+	switch(TYPE(obj)){
 	case T_ERROR:
 	case T_NIL:
 	case T_STRING:

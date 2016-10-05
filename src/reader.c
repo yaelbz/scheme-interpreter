@@ -101,7 +101,7 @@ void pushCharBack(int ch){
 OBJ ybReadList(FILE* inputStream){
 	int ch = getNextRelevantCharWithoutWhitespaces(inputStream);
 	if(ch==')'){
-		return newYbNil();
+		return globalNil;
 	}
 
 	pushCharBack(ch);
@@ -207,7 +207,7 @@ OBJ ybReadSymbol(FILE* inputStream){
 		//todo auch auf ... prüfen
 	}
 
-	obj = getOrAddFromSymbolTable(val);
+	obj = addToSymbolTable(val);
 	//free() mit dem angelegten Speicher als parameter
 	return obj;
 }

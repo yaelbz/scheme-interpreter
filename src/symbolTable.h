@@ -9,8 +9,6 @@
 #define SYMBOLTABLE_H_
 
 void initSymbolTable();
-void addToSymbolTable(struct ybSymbol);
-struct ybSymbol getFromSymbolTable(char *);
-OBJ getOrAddFromSymbolTable(char *);
+OBJ addToSymbolTable(char *);
 
 #endif /* SYMBOLTABLE_H_ */

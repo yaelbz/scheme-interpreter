@@ -13,19 +13,22 @@
 
 
 //--------------- object constructor - evtl auslagern in datei ----------------------//
-/******************
- * von gittinger übernommen (er hats in memory.c)
- * habs etwas an meinen code angepasst
- * ?? ist es sinnvoll ein memory.c zu haben? oder lieber irgendwie anders?
- ******************/
 
-OBJ newYbNil() {
-	struct ybAny *obj;
 
-	obj = (struct ybAny *)(malloc( sizeof(struct ybAny)));
-	obj->type = T_NIL;
-	return (OBJ)obj;
+//--------------- init ----------------------//
+
+void initGlobals(){
+	globalNil = (OBJ)(malloc( sizeof(struct ybAny)));
+	TYPE(globalNil) = T_NIL;
+
+	globalTrue = (OBJ)(malloc( sizeof(struct ybAny)));
+	TYPE(globalTrue) = T_TRUE;
+
+	globalFalse = (OBJ)(malloc( sizeof(struct ybAny)));
+	TYPE(globalFalse) = T_FALSE;
 }
+
+//--------------- new Objects ----------------------//
 
 //TODO: variable argument list. Wie wird da der Speicher verwaltet?
 OBJ newYbError(char *msg) {
@@ -44,6 +47,26 @@ OBJ newYbInteger(long iVal) {
 	obj = (struct ybInt *)(malloc( sizeof(struct ybInt)));
 	obj->type = T_INT;
 	obj->value = iVal;
+	return (OBJ)obj;
+}
+
+OBJ newYbIntNumber(long iVal) {
+	struct ybNumber *obj;
+
+	obj = (struct ybNumber *)(malloc( sizeof(struct ybNumber)));
+	obj->type = T_NUMBER;
+	obj->value.i = iVal;
+	obj->isInteger = true;
+	return (OBJ)obj;
+}
+
+OBJ newYbFloatNumber(double iVal) {
+	struct ybNumber *obj;
+
+	obj = (struct ybNumber *)(malloc( sizeof(struct ybNumber)));
+	obj->type = T_NUMBER;
+	obj->value.f = iVal;
+	obj->isInteger = false;
 	return (OBJ)obj;
 }
 
@@ -72,6 +95,14 @@ OBJ newYbSymbol(char *val){
 	return (OBJ)obj;
 }
 
+OBJ newYbBool(bool val){
+	struct ybBool *obj;
+	obj = (struct ybBool *)(malloc( sizeof(struct ybBool)));
+	obj->type = T_BOOL;
+	obj->value = val;
+	return (OBJ)obj;
+}
+
 OBJ newYbCons(OBJ car, OBJ cdr){
 	struct ybCons *obj;
 	obj = (struct ybCons *)(malloc(sizeof(struct ybCons)));
@@ -87,6 +118,23 @@ OBJ newYbFctBuiltin(char *name, ybFctPtr implementation){
 	obj->type=T_FCT_BUILTIN;
 	obj->name = name;
 	obj->impl = implementation;
+	return (OBJ)obj;
+}
+
+OBJ newSyntax(char *name, ybFctPtr implementation){
+	struct ybSyntax *obj;
+	obj = (struct ybSyntax *)(malloc(sizeof(struct ybSyntax)));
+	obj->type=T_SYNTAX;
+	obj->name = name;
+	obj->impl = implementation;
+	return (OBJ)obj;
+}
+
+//todo machen
+OBJ newYbEnvironment(){
+	struct ybEnvironment *obj;
+	obj = (struct ybEnvironment *)(malloc(sizeof(struct ybEnvironment)));
+	obj->type=T_ENVIRONMENT;
 	return (OBJ)obj;
 }
 

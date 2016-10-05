@@ -22,7 +22,7 @@ static int envCurrentSize;
  *
  ******************/
 void initEnv(){
-	printf("env --- initEnv\n");
+	//printf("env --- initEnv\n");
 
 	//environment initialisieren
 	env = (envEntry*)malloc(sizeof(envEntry)*ENV_INITIAL_SIZE);
@@ -39,7 +39,7 @@ void envAdd(OBJ key, OBJ value){
 	int startIndex = (int)key % envCurrentSize;
 	int searchIndex = startIndex;
 
-	printf("env --- envAdd 0x%08x\n", startIndex);
+	//printf("env --- envAdd 0x%08x\n", startIndex);
 
 	OBJ storedKey;
 	while(1){
@@ -70,7 +70,7 @@ void envAdd(OBJ key, OBJ value){
  *
  ******************/
 OBJ envGet(OBJ key){
-	printf("env --- envGet:\n");
+	//printf("env --- envGet:\n");
 	int startIndex = (int)key % envCurrentSize;
 	int searchIndex = startIndex;
 
@@ -83,7 +83,7 @@ OBJ envGet(OBJ key){
 		}
 		if(storedKey == NULL){
 			//key does not exist in env
-			return newYbNil();
+			return globalNil;
 		}
 		searchIndex = (searchIndex + 1) % envCurrentSize;
 		if (searchIndex == startIndex) {

@@ -15,10 +15,9 @@
 
 int main(){
 
-	//selftest();
-
 	printf("Hallöle!\n");
 
+	initGlobals();
 	initEval();
 
 	//repl
