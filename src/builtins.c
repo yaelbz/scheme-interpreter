@@ -13,6 +13,7 @@
 #include "evalStack.h"
 //Werbung: Hier könnte Ihr include stehen!
 
+//--------------- functions ----------------------//
 
 OBJ builtinPlus(int numArgs){
 	long sum =0;
@@ -107,4 +108,41 @@ OBJ builtinDivision(int numArgs){
 	}
 
 	return newYbFloatNumber(div);
+}
+
+//--------------- syntax ----------------------//
+/****
+ * Gittinger define-function nimmt als Parameter eine environment und eine Argumentenliste (und nicht die numArgs)
+ */
+OBJ builtinDefine(OBJ env, OBJ listOfArguments){
+	OBJ obj;
+
+
+	/*
+	Fälle:
+	1. wenn nur ein Argument --> Fehler. Define braucht mind. zwei Argumente
+	2. Wenn erstes Argument ein Symbol
+		Dann werden die restlichen Argumente an dieses Symbol gebunden?
+		laut gittinger muss es dann exakt zwei argumente geben
+		Bis nil?
+	3. Wenn erstes Argument ein Cons
+		Was heißt das dann?
+		Dann wirds ne user defined function. Der User will eine fkt definieren
+	4. wenn das erste Argument etwas anderes ist --> Fehler! (zb nummer oder string)
+
+	 */
+
+	return obj;
+}
+
+/****
+ * lambda
+ * (lambda kw-formals body ...+)
+ * macht funktion (ohne namen)
+ */
+OBJ builtinLambda(int numArgs){
+	OBJ obj;
+
+
+	return obj;
 }

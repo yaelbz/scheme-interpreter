@@ -11,10 +11,6 @@
 #include <string.h>
 #include "global.h"
 
-
-//--------------- object constructor - evtl auslagern in datei ----------------------//
-
-
 //--------------- init ----------------------//
 
 void initGlobals(){
@@ -27,6 +23,10 @@ void initGlobals(){
 	globalFalse = (OBJ)(malloc( sizeof(struct ybAny)));
 	TYPE(globalFalse) = T_FALSE;
 }
+
+
+//--------------- object constructor - evtl auslagern in datei ----------------------//
+
 
 //--------------- new Objects ----------------------//
 
@@ -112,29 +112,34 @@ OBJ newYbCons(OBJ car, OBJ cdr){
 	return (OBJ)obj;
 }
 
-OBJ newYbFctBuiltin(char *name, ybFctPtr implementation){
-	struct ybFctBuiltin *obj;
-	obj = (struct ybFctBuiltin *)(malloc(sizeof(struct ybFctBuiltin)));
-	obj->type=T_FCT_BUILTIN;
+OBJ newYbBuiltinFunction(char *name, ybFctPtr implementation){
+	struct ybBuiltinFunction *obj;
+	obj = (struct ybBuiltinFunction *)(malloc(sizeof(struct ybBuiltinFunction)));
+	obj->type=T_BUILTIN_FUNCTION;
 	obj->name = name;
 	obj->impl = implementation;
 	return (OBJ)obj;
 }
 
-OBJ newSyntax(char *name, ybFctPtr implementation){
-	struct ybSyntax *obj;
-	obj = (struct ybSyntax *)(malloc(sizeof(struct ybSyntax)));
-	obj->type=T_SYNTAX;
+OBJ newYbBuiltinSyntax(char *name, ybSyntaxPtr implementation){
+	struct ybBuiltinSyntax *obj;
+	obj = (struct ybBuiltinSyntax *)(malloc(sizeof(struct ybBuiltinSyntax)));
+	obj->type=T_BUILTIN_SYNTAX;
 	obj->name = name;
 	obj->impl = implementation;
 	return (OBJ)obj;
 }
 
-//todo machen
-OBJ newYbEnvironment(){
-	struct ybEnvironment *obj;
-	obj = (struct ybEnvironment *)(malloc(sizeof(struct ybEnvironment)));
+
+OBJ newYbEnvironment(int envSize, OBJ parentEnv, keyValuePair *envEntries){
+	ybEnvironment *obj;
+	//malloc, gittinger style:	int byteSize = offsetof(struct schemeEnvironment, slots) + sizeof(SCM_ENV_ENTRY)*numSlots;
+	//frage: malloc ok so?
+	obj = (ybEnvironment *)(malloc(sizeof(ybEnvironment)+sizeof(keyValuePair)*(envSize-1)));
 	obj->type=T_ENVIRONMENT;
+	obj->size=envSize;
+	obj->parentEnv = parentEnv;
+	obj->entries = envEntries;
 	return (OBJ)obj;
 }
 

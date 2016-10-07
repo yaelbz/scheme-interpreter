@@ -13,4 +13,10 @@ OBJ builtinMinus(int);
 OBJ builtinMultiplication(int);
 OBJ builtinDivision(int);
 
+
+OBJ builtinDefine(OBJ, OBJ);
+OBJ builtinLambda(int);
+
+
+
 #endif /* BUILTINS_H_ */

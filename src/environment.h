@@ -10,11 +10,6 @@
 
 #include "global.h"
 
-typedef struct {
-	OBJ key; //evtl ein stringObject
-	OBJ value; //kann jedes Object sein
-} envEntry;
-
 
 void initEnv();
 void envAdd(OBJ, OBJ);

@@ -24,9 +24,9 @@ typedef enum {
 	T_STRING,
 	T_SYMBOL,
 	T_CONS,
-	T_FCT_BUILTIN,
-	T_SYNTAX,
-	T_FCT_USER,
+	T_BUILTIN_FUNCTION,
+	T_BUILTIN_SYNTAX,
+	T_USER_FUNCTION,
 	T_ENVIRONMENT,
 	T_BOOL,
 }objType;
@@ -34,8 +34,8 @@ typedef enum {
 //--- object definitions ---//
 
 typedef struct ybObject *OBJ;
-typedef OBJ (*ybFctPtr)(int); //Function pointer for builtin function, syntax (and user defined functions)
-
+typedef OBJ (*ybFctPtr)(int); //Function pointer for builtin function
+typedef OBJ (*ybSyntaxPtr)(OBJ, OBJ); //Function pointer for builtin syntax
 
 struct ybAny {
 	objType type;
@@ -82,22 +82,29 @@ struct ybCons {
 	OBJ rest; //cdr
 };
 
-struct ybFctBuiltin {
+struct ybBuiltinFunction {
 	objType type;
 	char *name;
 	ybFctPtr impl; //implementation
 };
 
-struct ybSyntax {
+struct ybBuiltinSyntax {
 	objType type;
 	char *name;
-	ybFctPtr impl; //implementation
+	ybSyntaxPtr impl; //implementation
 };
 
-struct ybEnvironment {
+typedef struct {
+	OBJ key;
+	OBJ value;
+}keyValuePair;
+
+typedef struct {
 	objType type;
-	//todo was soll das enthalten? array?
-};
+	int size;
+	OBJ parentEnv;
+	keyValuePair *entries; //Ein Array mit Key-Value-Paaren -> das ist im Prinzip die Env
+} ybEnvironment;
 
 
 //--- general object ---//
@@ -112,10 +119,10 @@ struct ybObject {
 		struct ybSymbol 	 symbol;
 		struct ybBool		 boolean;
 		struct ybCons   	 cons;
-		struct ybFctBuiltin  fctBuiltin;
-		struct ybSyntax		 syntax;
-		struct ybEnvironment environment;
-		//struct ybFctUser 	fctUser;
+		struct ybBuiltinFunction  fctBuiltin;
+		struct ybBuiltinSyntax syntax;
+		ybEnvironment environment;
+		//struct ybUserFuntion 	fctUser;
 	} u;
 };
 
@@ -138,9 +145,9 @@ OBJ newYbString(char *);
 OBJ newYbSymbol(char *);
 OBJ newYbBool(bool);
 OBJ newYbCons(OBJ, OBJ);
-OBJ newYbFctBuiltin(char *, ybFctPtr);
-OBJ newYbSyntax(char *, ybFctPtr);
-OBJ newYbEnvironment(); //todo parameter???
+OBJ newYbBuiltinFunction(char *, ybFctPtr);
+OBJ newYbBuiltinSyntax(char *, ybSyntaxPtr);
+OBJ newYbEnvironment(int, OBJ, keyValuePair*);
 
 
 
