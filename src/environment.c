@@ -11,10 +11,10 @@
 #include <string.h>
 
 
-#define MAINENV_INITIAL_SIZE 511
+#define GLOBALENV_INITIAL_SIZE 511
 
-static ybEnvironment *mainEnv; //frage mit * oder ohne?
-static int mainEnvCurrentSize;
+OBJ globalEnv;
+int globalEnvSize;
 
 /******************
  * init Environment
@@ -23,42 +23,40 @@ static int mainEnvCurrentSize;
 void initEnv(){
 	//printf("env --- initEnv\n");
 
-	//environment initialisieren
-	//mainEnv
-	//frage ist das richtig dass ich auch hier den speicher mit malloc reservieren muss?
-	keyValuePair *envEntries = (keyValuePair*)malloc(sizeof(keyValuePair)*MAINENV_INITIAL_SIZE);
-	memset( (void*)envEntries, 0, (sizeof(keyValuePair) * MAINENV_INITIAL_SIZE));
-	mainEnv = newYbEnvironment(MAINENV_INITIAL_SIZE, NULL, envEntries);
-	mainEnvCurrentSize = MAINENV_INITIAL_SIZE;
+	//global environment initialisieren
+	globalEnv = newYbEnvironment(GLOBALENV_INITIAL_SIZE, NULL);
 }
 
 /******************
- * add to Environment
+ * add to main Environment
  *
  ******************/
-void envAdd(OBJ key, OBJ value){
+void globalEnvAdd(OBJ env, OBJ key, OBJ value){
 
-	int startIndex = (int)key % mainEnvCurrentSize;
+	int startIndex = (int)key % env->u.environment.size;
 	int searchIndex = startIndex;
 
 	//printf("env --- envAdd 0x%08x\n", startIndex);
 
 	OBJ storedKey;
 	while(1){
-		storedKey = mainEnv->entries[searchIndex].key;
+		storedKey = env->u.environment.entries[searchIndex].key;
 		if(storedKey == key){
 			//key already exists - replace value
-			mainEnv->entries[searchIndex].value = value;
+			env->u.environment.entries[searchIndex].value = value;
 			return;
 		}
 		if(storedKey == NULL){
 			//empty slot - store value
-			mainEnv->entries[searchIndex].key = key;
-			mainEnv->entries[searchIndex].value = value;
-			//todo rehash wenn env 3/4 voll --> currentSize anpassen
+			env->u.environment.entries[searchIndex].key = key;
+			env->u.environment.entries[searchIndex].value = value;
+			env->u.environment.entryCount++;
+			if(env->u.environment.entryCount >= env->u.environment.size*.75){
+				//todo rehash wenn env 3/4 voll
+			}
 			return;
 		}
-		searchIndex = (searchIndex + 1) % mainEnvCurrentSize;
+		searchIndex = (searchIndex + 1) % env->u.environment.size;
 		if (searchIndex == startIndex) {
 			//no empty slot found
 			//should not happen - rehash when 3/4 full earlier
@@ -68,29 +66,69 @@ void envAdd(OBJ key, OBJ value){
 }
 
 /******************
- * get from Environment
+ * add to Environment
+ * mit optionalem parameter env. wenn nichts mitgegeben wird, dann wird in die main env geschrieben
+ * frage ist das gut so oder ist das unsicher?
+ ******************/
+void envAdd(OBJ env, OBJ key, OBJ value){
+	if(env == NULL) {
+		env = globalEnv;
+	}
+
+	//TODO: Type prüfen, es könnte ja ein ganz anderes objekt sein...
+
+	if(env == globalEnv) {
+		globalEnvAdd(env, key, value);
+	} else {
+		//local environment
+	}
+
+	//else
+	//wenn es noch freie slots in der env gibt -> wenn länge des entries-array kleiner size
+	//env->entries[?].key = key;
+	//env->entries[?].value = value;
+}
+
+/******************
+ * get from main Environment
  *
  ******************/
-OBJ envGet(OBJ key){
+OBJ globalEnvGet(OBJ env, OBJ key){
 	//printf("env --- envGet:\n");
-	int startIndex = (int)key % mainEnvCurrentSize;
+	int startIndex = (int)key % env->u.environment.size;
 	int searchIndex = startIndex;
 
 	OBJ storedKey;
 	while(1){
-		storedKey = mainEnv->entries[searchIndex].key;
+		storedKey = globalEnv->u.environment.entries[searchIndex].key;
 		if(storedKey == key){
 			//found
-			return mainEnv->entries[searchIndex].value;
+			return globalEnv->u.environment.entries[searchIndex].value;
 		}
 		if(storedKey == NULL){
 			//key does not exist in env
 			return globalNil;
 		}
-		searchIndex = (searchIndex + 1) % mainEnvCurrentSize;
+		searchIndex = (searchIndex + 1) % env->u.environment.size;
 		if (searchIndex == startIndex) {
 			//Env full - should not happen. Something went wrong in envAdd()
 			return newYbError("env: searched key not found since mainEnv is full. check envAdd -> rehash");
 		}
+	}
+}
+
+/******************
+ * get from Environment
+ *
+ ******************/
+OBJ envGet(OBJ env, OBJ key){
+	if(env == NULL) {
+		env = globalEnv;
+	}
+	if(env == globalEnv) {
+		return globalEnvGet(env, key);
+	} else {
+		//todo: local environment
+		return globalEnvGet(env, key);
 	}
 }

@@ -12,7 +12,6 @@
 #include "printer.h"
 
 
-
 int main(){
 
 	printf("Hallöle!\n");
@@ -26,8 +25,8 @@ int main(){
 		fflush(stdout);
 		//read
 		OBJ readObj = ybRead(stdin);
-		//eval
-		OBJ evalObj = ybEval(readObj);
+		//eval. NULL = global environment
+		OBJ evalObj = ybEval(NULL, readObj);
 		//print
 		ybPrint(evalObj);
 	}

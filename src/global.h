@@ -28,7 +28,6 @@ typedef enum {
 	T_BUILTIN_SYNTAX,
 	T_USER_FUNCTION,
 	T_ENVIRONMENT,
-	T_BOOL,
 }objType;
 
 //--- object definitions ---//
@@ -53,7 +52,6 @@ struct ybInt {
 
 struct ybNumber {
 	objType type;
-	//todo merken was es ist- i oder f
 	union {
 		long   i;
 		double f;
@@ -70,12 +68,12 @@ struct ybString {
 	objType type;
 	char *string;
 };
-
+/*
 struct ybBool {
 	objType type;
 	bool value;
 };
-
+*/
 struct ybCons {
 	objType type;
 	OBJ first; //car
@@ -102,8 +100,9 @@ typedef struct {
 typedef struct {
 	objType type;
 	int size;
+	int entryCount;
 	OBJ parentEnv;
-	keyValuePair *entries; //Ein Array mit Key-Value-Paaren -> das ist im Prinzip die Env
+	keyValuePair entries[]; //Ein Array mit Key-Value-Paaren -> das ist im Prinzip die Env
 } ybEnvironment;
 
 
@@ -117,17 +116,21 @@ struct ybObject {
 		struct ybNumber    	 number;
 		struct ybString 	 string;
 		struct ybSymbol 	 symbol;
-		struct ybBool		 boolean;
+		//struct ybBool		 boolean;
 		struct ybCons   	 cons;
 		struct ybBuiltinFunction  fctBuiltin;
-		struct ybBuiltinSyntax syntax;
-		ybEnvironment environment;
+		struct ybBuiltinSyntax    syntax;
+		ybEnvironment             environment;
 		//struct ybUserFuntion 	fctUser;
 	} u;
 };
 
 //macro
-#define TYPE(x) ((x)->u.any.type)
+#define TYPE(x)      ((x)->u.any.type)
+#define FIRST(x)     ((x)->u.cons.first)
+#define REST(x)      ((x)->u.cons.rest)
+#define IS_TRUE(x)   ((x)->u.any.type == T_TRUE)
+#define IS_FALSE(x)  ((x)->u.any.type == T_FALSE)
 
 OBJ globalNil;
 OBJ globalTrue;
@@ -137,7 +140,7 @@ OBJ globalFalse;
 
 void initGlobals();
 
-OBJ newYbError(char *);
+OBJ newYbError(const char *, ...);
 OBJ newYbInteger(long);
 OBJ newYbIntNumber(long);
 OBJ newYbFloatNumber(double);
@@ -147,7 +150,7 @@ OBJ newYbBool(bool);
 OBJ newYbCons(OBJ, OBJ);
 OBJ newYbBuiltinFunction(char *, ybFctPtr);
 OBJ newYbBuiltinSyntax(char *, ybSyntaxPtr);
-OBJ newYbEnvironment(int, OBJ, keyValuePair*);
+OBJ newYbEnvironment(int, OBJ);
 
 
 

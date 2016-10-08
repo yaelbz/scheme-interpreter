@@ -15,6 +15,7 @@ OBJ builtinDivision(int);
 
 
 OBJ builtinDefine(OBJ, OBJ);
+OBJ builtinIf(OBJ, OBJ);
 OBJ builtinLambda(int);
 
 

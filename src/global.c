@@ -31,8 +31,15 @@ void initGlobals(){
 //--------------- new Objects ----------------------//
 
 //TODO: variable argument list. Wie wird da der Speicher verwaltet?
-OBJ newYbError(char *msg) {
+OBJ newYbError(const char *format, ...) {
 	struct ybError *obj;
+
+	va_list args;
+	va_start(args, format);
+	//max error message length = 255
+	char msg[255];
+	vsprintf(msg, format, args);
+	va_end(args);
 
 	obj = (struct ybError *)(malloc( sizeof(struct ybError)));
 	obj->type = T_ERROR;
@@ -94,7 +101,7 @@ OBJ newYbSymbol(char *val){
 	strcpy(obj->name, val);
 	return (OBJ)obj;
 }
-
+/*
 OBJ newYbBool(bool val){
 	struct ybBool *obj;
 	obj = (struct ybBool *)(malloc( sizeof(struct ybBool)));
@@ -102,7 +109,7 @@ OBJ newYbBool(bool val){
 	obj->value = val;
 	return (OBJ)obj;
 }
-
+*/
 OBJ newYbCons(OBJ car, OBJ cdr){
 	struct ybCons *obj;
 	obj = (struct ybCons *)(malloc(sizeof(struct ybCons)));
@@ -131,15 +138,15 @@ OBJ newYbBuiltinSyntax(char *name, ybSyntaxPtr implementation){
 }
 
 
-OBJ newYbEnvironment(int envSize, OBJ parentEnv, keyValuePair *envEntries){
+OBJ newYbEnvironment(int envSize, OBJ parentEnv){
 	ybEnvironment *obj;
 	//malloc, gittinger style:	int byteSize = offsetof(struct schemeEnvironment, slots) + sizeof(SCM_ENV_ENTRY)*numSlots;
-	//frage: malloc ok so?
-	obj = (ybEnvironment *)(malloc(sizeof(ybEnvironment)+sizeof(keyValuePair)*(envSize-1)));
+	obj = (ybEnvironment *)(malloc(sizeof(ybEnvironment)+sizeof(keyValuePair)*envSize));
 	obj->type=T_ENVIRONMENT;
 	obj->size=envSize;
+	obj->entryCount=0;
 	obj->parentEnv = parentEnv;
-	obj->entries = envEntries;
+	memset( (void*)&(obj->entries), 0, (sizeof(keyValuePair) * envSize));
 	return (OBJ)obj;
 }
 

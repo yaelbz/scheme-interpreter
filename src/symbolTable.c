@@ -32,7 +32,7 @@ void initSymbolTable(){
 /******************
  * hash
  * from: http://www.cse.yorku.ca/~oz/hash.html --> djb2
- * todo: es gibt wohl auch ein strhash.h was man mit include einbinden kann - vllt mal angucken
+ * es gibt wohl auch ein strhash.h was man mit include einbinden kann - vllt mal angucken
  ******************/
 unsigned int hash(char *str)
 {

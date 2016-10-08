@@ -12,8 +12,8 @@
 
 
 void initEnv();
-void envAdd(OBJ, OBJ);
-OBJ envGet(OBJ);
+void envAdd(OBJ, OBJ, OBJ);
+OBJ envGet(OBJ, OBJ);
 
 
 #endif /* ENVIRONMENT_H_ */

@@ -5,11 +5,11 @@
  *      Author: yael
  */
 
-//todo hier könnten doch sowohl die builtin-Funktions als auch die builtin-Syntax rein
 
 #include <stdio.h>
 
 #include "global.h"
+#include "evaluator.h"
 #include "evalStack.h"
 //Werbung: Hier könnte Ihr include stehen!
 
@@ -111,14 +111,56 @@ OBJ builtinDivision(int numArgs){
 }
 
 //--------------- syntax ----------------------//
+/*
+OBJ builtinEqual(OBJ env, OBJ listOfArguments){
+
+}
+*/
+
+OBJ builtinIf(OBJ env, OBJ listOfArguments){
+
+	if(TYPE(listOfArguments) != T_CONS){
+		return newYbError("builtin (if): expects two or three arguments");
+	}
+
+	OBJ conditionExpr = FIRST(listOfArguments);
+	if(TYPE(REST(listOfArguments)) != T_CONS){
+		return newYbError("builtin (if): expects two or three arguments");
+	}
+	listOfArguments = REST(listOfArguments);
+
+	OBJ trueExpr = FIRST(listOfArguments);
+	OBJ falseExpr = globalNil;
+	if(TYPE(REST(listOfArguments)) == T_CONS){
+		listOfArguments = REST(listOfArguments);
+		falseExpr = FIRST(listOfArguments);
+		if(REST(listOfArguments) != globalNil){
+			return newYbError("builtin (if): expects two or three arguments");
+		}
+	}
+
+	//evaluate condition
+	OBJ evaluatedCondition = ybEval(env, conditionExpr);
+	if(evaluatedCondition == globalTrue){
+		return ybEval(env, trueExpr);
+	}
+	if(evaluatedCondition == globalFalse){
+		return ybEval(env, falseExpr);
+	}
+
+	return newYbError("builtin (if): condition is not a boolean");
+}
+
+
 /****
  * Gittinger define-function nimmt als Parameter eine environment und eine Argumentenliste (und nicht die numArgs)
  */
+/*
 OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 	OBJ obj;
 
 
-	/*
+
 	Fälle:
 	1. wenn nur ein Argument --> Fehler. Define braucht mind. zwei Argumente
 	2. Wenn erstes Argument ein Symbol
@@ -130,19 +172,20 @@ OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 		Dann wirds ne user defined function. Der User will eine fkt definieren
 	4. wenn das erste Argument etwas anderes ist --> Fehler! (zb nummer oder string)
 
-	 */
 
 	return obj;
 }
-
+*/
 /****
  * lambda
  * (lambda kw-formals body ...+)
  * macht funktion (ohne namen)
  */
+/*
 OBJ builtinLambda(int numArgs){
 	OBJ obj;
 
 
 	return obj;
 }
+*/

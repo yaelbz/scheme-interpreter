@@ -35,10 +35,11 @@ bool isWhitespace(int ch){
 bool isSymbolInitialChar(int ch){
 	//aus: http://www.scheme.com/tspl2d/grammar.html --> identifier
 	//<letter> | ! | $ | % | & | * | / | : | < | = | > | ? | ~ | _ | ^
-	// + | - | . --> prüfung auf Sonderfälle in ybReadSymbol
+	// + | - | . | # --> prüfung auf Sonderfälle in ybReadSymbol
 	return (ch=='!' || ch=='$' || ch=='%' || ch=='&' || ch=='*' || ch=='/' ||
 			ch==':' || ch=='<' || ch=='=' || ch=='>' || ch=='?' || ch=='~' ||
-			ch=='^' || ch=='_' || ch=='.' || ch=='+' || ch=='-' || isLetter(ch));
+			ch=='^' || ch=='_' || ch=='.' || ch=='+' || ch=='-' || ch=='#' ||
+			isLetter(ch));
 }
 
 bool isSymbolSubsequentChar(int ch){
@@ -198,13 +199,22 @@ OBJ ybReadSymbol(FILE* inputStream){
 	*p='\0'; //damit klar ist wann der string zuende ist
 	pushCharBack(ch);
 
-	//sonderfälle prüfen: + - ...
 	if((val[0]=='+' || val[0]=='-') && val[1]!='\0'){
-		//fehlermeldung, da beginnt nämlich ein symbol mit + oder -
-		return newYbError("syntax error: not a valid symbol");
+		return newYbError("syntax error: not a valid symbol: %s", val);
 		//ybThrowError(-1, "syntax error: not a symbol");
 
-		//todo auch auf ... prüfen
+	}
+	if(strcmp(val, "nil")==0){
+		return globalNil;
+	}
+	if(strcmp(val, "#t")==0){
+		return globalTrue;
+	}
+	if(strcmp(val, "#f")==0){
+		return globalFalse;
+	}
+	if(val[0]=='#'){
+		return newYbError("syntax error: not a valid symbol: %s", val);
 	}
 
 	obj = addToSymbolTable(val);
