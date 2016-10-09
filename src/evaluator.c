@@ -33,9 +33,8 @@ void initBuiltins(){
 	//lambda
 }
 
-void initEval(){
+void initEvaluator(){
 	initEvalStack();
-	initSymbolTable();
 	initEnv();
 	initBuiltins(); //Environment and symbolTable must be initialized first!
 }

@@ -48,15 +48,6 @@ OBJ newYbError(const char *format, ...) {
 	return (OBJ)obj;
 }
 
-OBJ newYbInteger(long iVal) {
-	struct ybInt *obj;
-
-	obj = (struct ybInt *)(malloc( sizeof(struct ybInt)));
-	obj->type = T_INT;
-	obj->value = iVal;
-	return (OBJ)obj;
-}
-
 OBJ newYbIntNumber(long iVal) {
 	struct ybNumber *obj;
 

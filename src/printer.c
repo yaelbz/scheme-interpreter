@@ -63,9 +63,6 @@ void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 		case T_FALSE:
 			printf("%s%sfalse\n", indentString, prefix);
 			break;
-		case T_INT:
-			printf("%s%sint(%ld)\n", indentString, prefix, obj->u.integer.value);
-			break;
 		case T_NUMBER:
 			if(obj->u.number.isInteger) {
 				printf("%s%sint(%ld)\n", indentString, prefix, obj->u.number.value.i);

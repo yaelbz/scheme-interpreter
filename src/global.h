@@ -19,7 +19,6 @@ typedef enum {
 	T_NIL=0,
 	T_TRUE,
 	T_FALSE,
-	T_INT,
 	T_NUMBER,
 	T_STRING,
 	T_SYMBOL,
@@ -43,11 +42,6 @@ struct ybAny {
 struct ybError {
 	objType type;
 	char *message;
-};
-
-struct ybInt {
-	objType type;
-	long value;
 };
 
 struct ybNumber {
@@ -112,7 +106,6 @@ struct ybObject {
 	union {
 		struct ybAny    	 any;
 		struct ybError  	 error;
-		struct ybInt    	 integer;
 		struct ybNumber    	 number;
 		struct ybString 	 string;
 		struct ybSymbol 	 symbol;
@@ -141,7 +134,6 @@ OBJ globalFalse;
 void initGlobals();
 
 OBJ newYbError(const char *, ...);
-OBJ newYbInteger(long);
 OBJ newYbIntNumber(long);
 OBJ newYbFloatNumber(double);
 OBJ newYbString(char *);

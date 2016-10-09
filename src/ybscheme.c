@@ -17,7 +17,8 @@ int main(){
 	printf("Hallöle!\n");
 
 	initGlobals();
-	initEval();
+	initReader();
+	initEvaluator();
 
 	//repl
 	while(1){

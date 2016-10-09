@@ -20,6 +20,12 @@ static int pushedChar = -1;
 
 //--------------- helper functions ----------------------//
 
+void initReader() {
+	initSymbolTable();
+}
+
+//--------------- helper functions ----------------------//
+
 bool isDigit(int ch){
 	return (ch>='0' && ch<='9');
 }
@@ -142,7 +148,7 @@ OBJ ybReadInt(FILE* inputStream, int firstDigit){
 		}
 		pushCharBack(ch);
 
-		obj = newYbInteger(val);
+		obj = newYbIntNumber(val);
 
 	return obj;
 }

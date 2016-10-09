@@ -9,8 +9,10 @@
 #ifndef READER_H_
 #define READER_H_
 
+#include "global.h"
 
-//Diese Funktionen werden von außerhalb (von reader.c) aufgerufen
+
+void initReader();
 OBJ ybRead(FILE*);
 
 

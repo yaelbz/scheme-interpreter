@@ -20,46 +20,43 @@ OBJ builtinPlus(int numArgs){
 
 	while(numArgs>0){
 		OBJ obj = popFromEvalStack();
-		if(obj->u.any.type==T_INT){
-			sum += obj->u.integer.value;
+		if(TYPE(obj)==T_NUMBER && obj->u.number.isInteger) {
+			sum += obj->u.number.value.i;
 			numArgs--;
-		}
-		else{
-			ybThrowError(-1, "builtin (+) can only handle integers");
+		} else {
+			return newYbError("builtin (+) can only handle integers");
 		}
 	}
 
-	return newYbInteger(sum);
+	return newYbIntNumber(sum);
 }
 
 OBJ builtinMinus(int numArgs){
 	long diff = 0;
 
 	if(numArgs < 1){
-		ybThrowError(-1, "builtin (-) needs minimum 1 argument");
+		return newYbError("builtin (-) needs minimum 1 argument");
 	}
 	while(numArgs>1){
 		OBJ obj = popFromEvalStack();
-		if(obj->u.any.type==T_INT){
-			diff -= obj->u.integer.value;
+		if(TYPE(obj)==T_NUMBER && obj->u.number.isInteger) {
+			diff -= obj->u.number.value.i;
 			numArgs--;
-		}
-		else{
-			ybThrowError(-1, "builtin (-) can only handle integers");
+		} else {
+			return newYbError("builtin (-) can only handle integers");
 		}
 	}
 	if(numArgs>0){
 		OBJ obj = popFromEvalStack();
-		if(obj->u.any.type==T_INT){
-			diff += obj->u.integer.value;
+		if(TYPE(obj)==T_NUMBER && obj->u.number.isInteger) {
+			diff += obj->u.number.value.i;
 			numArgs--;
-		}
-		else{
-			ybThrowError(-1, "builtin (-) can only handle integers");
+		} else {
+			return newYbError("builtin (-) can only handle integers");
 		}
 	}
 
-	return newYbInteger(diff);
+	return newYbIntNumber(diff);
 }
 
 OBJ builtinMultiplication(int numArgs){
@@ -67,16 +64,15 @@ OBJ builtinMultiplication(int numArgs){
 
 	while(numArgs>0){
 		OBJ obj = popFromEvalStack();
-		if(obj->u.any.type==T_INT){
-			prod *= obj->u.integer.value;
+		if(TYPE(obj)==T_NUMBER && obj->u.number.isInteger) {
+			prod *= obj->u.number.value.i;
 			numArgs--;
-		}
-		else{
-			ybThrowError(-1, "builtin (*) can only handle integers");
+		} else {
+			return newYbError("builtin (*) can only handle integers");
 		}
 	}
 
-	return newYbInteger(prod);
+	return newYbIntNumber(prod);
 }
 
 
@@ -84,26 +80,24 @@ OBJ builtinDivision(int numArgs){
 	double div = 1;
 
 	if(numArgs<1){
-		ybThrowError(-1, "builtin (/) needs minimum 1 argument");
+		return newYbError("builtin (/) needs minimum 1 argument");
 	}
 	while(numArgs>1){
 		OBJ obj = popFromEvalStack();
-		if(obj->u.any.type==T_INT){
-			div /= (double)obj->u.integer.value;
+		if(TYPE(obj)==T_NUMBER && obj->u.number.isInteger) {
+			div /= (double)obj->u.number.value.i;
 			numArgs--;
-		}
-		else{
-			ybThrowError(-1, "builtin (/) can only handle integers");
+		} else {
+			return newYbError("builtin (/) can only handle integers");
 		}
 	}
 	if(numArgs>0){
 		OBJ obj = popFromEvalStack();
-		if(obj->u.any.type==T_INT){
-			div *= (double)obj->u.integer.value;
+		if(TYPE(obj)==T_NUMBER && obj->u.number.isInteger) {
+			div *= (double)obj->u.number.value.i;
 			numArgs--;
-		}
-		else{
-			ybThrowError(-1, "builtin (/) can only handle integers");
+		} else {
+			return newYbError("builtin (/) can only handle integers");
 		}
 	}
 
