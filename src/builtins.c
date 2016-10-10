@@ -7,6 +7,8 @@
 
 
 #include <stdio.h>
+#include <float.h>
+#include <string.h>
 
 #include "global.h"
 #include "evaluator.h"
@@ -105,11 +107,122 @@ OBJ builtinDivision(int numArgs){
 }
 
 //--------------- syntax ----------------------//
-/*
-OBJ builtinEqual(OBJ env, OBJ listOfArguments){
 
+//equal - helper functions
+
+bool hasTwoArguments(OBJ listOfArguments){
+	if(TYPE(listOfArguments) != T_CONS){
+		return false;
+	}
+
+	if(TYPE(REST(listOfArguments)) != T_CONS){
+		//only one argument
+		return false;
+	}
+
+	//if false then more than two arguments
+	return (REST(REST(listOfArguments)) == globalNil);
 }
-*/
+
+bool areFloatsEqual(double a, double b){
+	double diff = a-b;
+	return (diff<DBL_EPSILON) && (-diff<DBL_EPSILON);
+}
+
+
+// (eq? x x)
+//compare if same object
+OBJ builtinEqQ(OBJ env, OBJ listOfArguments){
+	(void)env; //removes warning: unused parameter env
+	if(!hasTwoArguments(listOfArguments)){
+		return newYbError("builtin (eq?): expects exactly two arguments");
+	}
+
+	OBJ firstObj = FIRST(listOfArguments);
+	OBJ rest = REST(listOfArguments);
+	OBJ secondObj = FIRST(rest);
+
+	if(firstObj == secondObj){
+		return globalTrue;
+	}
+
+	return globalFalse;
+}
+
+//(= x x)
+//predicate when you wish to test whether two numbers are equivalent.
+OBJ builtinEqualOperator(OBJ env, OBJ listOfArguments){
+	(void)env; //removes warning: unused parameter env
+	if(!hasTwoArguments(listOfArguments)){
+		return newYbError("builtin (=): expects exactly two arguments");
+	}
+
+	OBJ firstObj = FIRST(listOfArguments);
+	OBJ rest = REST(listOfArguments);
+	OBJ secondObj = FIRST(rest);
+
+	//both arguments must be numbers
+	if(TYPE(firstObj)!=T_NUMBER || TYPE(secondObj)!=T_NUMBER){
+		return newYbError("builtin (=): Arguments must be numbers");
+	}
+
+	//if both arguments are integers
+	if(firstObj->u.number.isInteger && secondObj->u.number.isInteger){
+		//if both arguments (numbers) have same value
+		if(firstObj->u.number.value.i == secondObj->u.number.value.i){
+			return globalTrue;
+		}
+	}
+
+	//if both arguments are float (not integer)
+	if(!firstObj->u.number.isInteger && !secondObj->u.number.isInteger){
+		if(areFloatsEqual(firstObj->u.number.value.f, secondObj->u.number.value.f)){
+			return globalTrue;
+		}
+	}
+
+	//frage was wenn ein objekt int ist und ein objekt float ist?
+
+	return globalFalse;
+}
+
+//(eqv? x x)
+//predicate when you wish to test whether two non-numeric values are equivalent.
+OBJ builtinEqvQ(OBJ env, OBJ listOfArguments){
+ 	 (void)env; //removes warning: unused parameter env
+ 	if(!hasTwoArguments(listOfArguments)){
+		return newYbError("builtin (eqv?): expects exactly two arguments");
+	}
+
+ 	OBJ firstObj = FIRST(listOfArguments);
+	OBJ rest = REST(listOfArguments);
+	OBJ secondObj = FIRST(rest);
+
+	//if both arguments are numbers
+	if((TYPE(firstObj) == T_NUMBER) && (TYPE(secondObj) == T_NUMBER)){
+		return builtinEqualOperator(env, listOfArguments);
+	}
+
+	//if both arguments are strings
+	if(TYPE(firstObj) == T_STRING && TYPE(secondObj) == T_STRING){
+		if(strcmp(firstObj->u.string.string, secondObj->u.string.string) == 0){
+			return globalTrue;
+		}
+	}
+
+	return globalFalse;
+
+	//frage was ist mit anderen Objekttypen?
+}
+
+//(equal? x x)
+//Use the equal? predicate when you wish to test whether two lists, vectors, etc. are equivalent.
+/*OBJ builtinEqualQ(OBJ env, OBJ listOfArguments){
+ 	 (void)env; //removes warning: unused parameter env
+
+}*/
+
+//-- if --//
 
 OBJ builtinIf(OBJ env, OBJ listOfArguments){
 

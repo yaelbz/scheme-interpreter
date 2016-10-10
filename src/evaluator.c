@@ -28,7 +28,10 @@ void initBuiltins(){
 	envAdd(NULL, addToSymbolTable("/"), newYbBuiltinFunction("/", &builtinDivision));
 	//syntax
 	//envAdd(NULL, addToSymbolTable("define"), newYbBuiltinSyntax("define", &builtinDefine));
-	envAdd(NULL, addToSymbolTable("if"),     newYbBuiltinSyntax("if",     &builtinIf));
+	envAdd(NULL, addToSymbolTable("if"),	newYbBuiltinSyntax("if",	&builtinIf));
+	envAdd(NULL, addToSymbolTable("eq?"),	newYbBuiltinSyntax("eq?",	&builtinEqQ));
+	envAdd(NULL, addToSymbolTable("="),		newYbBuiltinSyntax("=",		&builtinEqualOperator));
+	envAdd(NULL, addToSymbolTable("eqv?"),	newYbBuiltinSyntax("eqv?",	&builtinEqvQ));
 	//quote
 	//lambda
 }

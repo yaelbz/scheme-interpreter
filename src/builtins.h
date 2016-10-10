@@ -14,6 +14,10 @@ OBJ builtinMultiplication(int);
 OBJ builtinDivision(int);
 
 
+OBJ builtinEqvQ(OBJ, OBJ);
+OBJ builtinEqQ(OBJ, OBJ);
+OBJ builtinEqualOperator(OBJ, OBJ);
+OBJ builtinEqualQ(OBJ, OBJ);
 OBJ builtinDefine(OBJ, OBJ);
 OBJ builtinIf(OBJ, OBJ);
 OBJ builtinLambda(int);
