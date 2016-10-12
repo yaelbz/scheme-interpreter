@@ -11,8 +11,11 @@
 #include <string.h>
 #include "global.h"
 
-//--------------- init ----------------------//
+// #### init #######################################################################################
 
+//------------------------
+// init global nil, true, false
+//------------------------
 void initGlobals(){
 	globalNil = (OBJ)(malloc( sizeof(struct ybAny)));
 	TYPE(globalNil) = T_NIL;
@@ -24,12 +27,11 @@ void initGlobals(){
 	TYPE(globalFalse) = T_FALSE;
 }
 
+// #### constructor #######################################################################################
 
-//--------------- object constructor - evtl auslagern in datei ----------------------//
-
-
-//--------------- new Objects ----------------------//
-
+//------------------------
+// new error
+//------------------------
 //TODO: variable argument list. Wie wird da der Speicher verwaltet?
 OBJ newYbError(const char *format, ...) {
 	struct ybError *obj;
@@ -48,6 +50,9 @@ OBJ newYbError(const char *format, ...) {
 	return (OBJ)obj;
 }
 
+//------------------------
+// new int
+//------------------------
 OBJ newYbIntNumber(long iVal) {
 	struct ybNumber *obj;
 
@@ -58,6 +63,9 @@ OBJ newYbIntNumber(long iVal) {
 	return (OBJ)obj;
 }
 
+//------------------------
+// new float
+//------------------------
 OBJ newYbFloatNumber(double iVal) {
 	struct ybNumber *obj;
 
@@ -68,6 +76,9 @@ OBJ newYbFloatNumber(double iVal) {
 	return (OBJ)obj;
 }
 
+//------------------------
+// new string
+//------------------------
 OBJ newYbString(char *val){
 	struct ybString *obj;
 	/*/*
@@ -83,6 +94,9 @@ OBJ newYbString(char *val){
 	return (OBJ)obj;
 }
 
+//------------------------
+// new symbol
+//------------------------
 OBJ newYbSymbol(char *val){
 	struct ybSymbol *obj;
 	//siehe anmerkung in newString()
@@ -93,6 +107,9 @@ OBJ newYbSymbol(char *val){
 	return (OBJ)obj;
 }
 /*
+//------------------------
+// new bool
+//------------------------
 OBJ newYbBool(bool val){
 	struct ybBool *obj;
 	obj = (struct ybBool *)(malloc( sizeof(struct ybBool)));
@@ -101,6 +118,10 @@ OBJ newYbBool(bool val){
 	return (OBJ)obj;
 }
 */
+
+//------------------------
+// new cons
+//------------------------
 OBJ newYbCons(OBJ car, OBJ cdr){
 	struct ybCons *obj;
 	obj = (struct ybCons *)(malloc(sizeof(struct ybCons)));
@@ -110,6 +131,9 @@ OBJ newYbCons(OBJ car, OBJ cdr){
 	return (OBJ)obj;
 }
 
+//------------------------
+// new builtin function
+//------------------------
 OBJ newYbBuiltinFunction(char *name, ybFctPtr implementation){
 	struct ybBuiltinFunction *obj;
 	obj = (struct ybBuiltinFunction *)(malloc(sizeof(struct ybBuiltinFunction)));
@@ -119,6 +143,9 @@ OBJ newYbBuiltinFunction(char *name, ybFctPtr implementation){
 	return (OBJ)obj;
 }
 
+//------------------------
+// new builtin syntax
+//------------------------
 OBJ newYbBuiltinSyntax(char *name, ybSyntaxPtr implementation){
 	struct ybBuiltinSyntax *obj;
 	obj = (struct ybBuiltinSyntax *)(malloc(sizeof(struct ybBuiltinSyntax)));
@@ -128,7 +155,9 @@ OBJ newYbBuiltinSyntax(char *name, ybSyntaxPtr implementation){
 	return (OBJ)obj;
 }
 
-
+//------------------------
+// new environment
+//------------------------
 OBJ newYbEnvironment(int envSize, OBJ parentEnv){
 	ybEnvironment *obj;
 	//malloc, gittinger style:	int byteSize = offsetof(struct schemeEnvironment, slots) + sizeof(SCM_ENV_ENTRY)*numSlots;
@@ -142,8 +171,11 @@ OBJ newYbEnvironment(int envSize, OBJ parentEnv){
 }
 
 
-//--------------- Error ----------------------//
+// #### error #######################################################################################
 
+//------------------------
+// throw error
+//------------------------
 //TODO: declare enum with errors in global header
 void ybThrowError(int ybErrNum, const char *format, ...) {
 	va_list args;

@@ -12,12 +12,13 @@ OBJ builtinPlus(int);
 OBJ builtinMinus(int);
 OBJ builtinMultiplication(int);
 OBJ builtinDivision(int);
+OBJ builtinEqvQ(int);
+OBJ builtinEqQ(int);
+OBJ builtinEqualOperator(int);
+OBJ builtinEqualQ(int);
+OBJ builtinNot(int);
 
 
-OBJ builtinEqvQ(OBJ, OBJ);
-OBJ builtinEqQ(OBJ, OBJ);
-OBJ builtinEqualOperator(OBJ, OBJ);
-OBJ builtinEqualQ(OBJ, OBJ);
 OBJ builtinDefine(OBJ, OBJ);
 OBJ builtinIf(OBJ, OBJ);
 OBJ builtinLambda(int);

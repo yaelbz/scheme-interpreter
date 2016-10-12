@@ -1,8 +1,6 @@
 /*
  * builtins.c
  *
- *  Created on: 03.10.2016
- *      Author: yael
  */
 
 
@@ -13,10 +11,12 @@
 #include "global.h"
 #include "evaluator.h"
 #include "evalStack.h"
-//Werbung: Hier könnte Ihr include stehen!
 
-//--------------- functions ----------------------//
+// #### functions #######################################################################################
 
+//------------------------
+// +
+//------------------------
 OBJ builtinPlus(int numArgs){
 	long sum =0;
 
@@ -33,6 +33,9 @@ OBJ builtinPlus(int numArgs){
 	return newYbIntNumber(sum);
 }
 
+//------------------------
+// -
+//------------------------
 OBJ builtinMinus(int numArgs){
 	long diff = 0;
 
@@ -61,6 +64,9 @@ OBJ builtinMinus(int numArgs){
 	return newYbIntNumber(diff);
 }
 
+//------------------------
+// *
+//------------------------
 OBJ builtinMultiplication(int numArgs){
 	long prod =1;
 
@@ -77,7 +83,9 @@ OBJ builtinMultiplication(int numArgs){
 	return newYbIntNumber(prod);
 }
 
-
+//------------------------
+// /
+//------------------------
 OBJ builtinDivision(int numArgs){
 	double div = 1;
 
@@ -106,8 +114,6 @@ OBJ builtinDivision(int numArgs){
 	return newYbFloatNumber(div);
 }
 
-//--------------- syntax ----------------------//
-
 //equal - helper functions
 
 bool hasTwoArguments(OBJ listOfArguments){
@@ -120,27 +126,30 @@ bool hasTwoArguments(OBJ listOfArguments){
 		return false;
 	}
 
-	//if false then more than two arguments
+	//false: more than two arguments
 	return (REST(REST(listOfArguments)) == globalNil);
 }
 
+//------------------------
+// todo source?
+//------------------------
 bool areFloatsEqual(double a, double b){
 	double diff = a-b;
 	return (diff<DBL_EPSILON) && (-diff<DBL_EPSILON);
 }
 
-
+//------------------------
 // (eq? x x)
-//compare if same object
-OBJ builtinEqQ(OBJ env, OBJ listOfArguments){
-	(void)env; //removes warning: unused parameter env
-	if(!hasTwoArguments(listOfArguments)){
+// compare if same object
+//------------------------
+OBJ builtinEqQ(int numArgs){
+	if(numArgs != 2){
 		return newYbError("builtin (eq?): expects exactly two arguments");
 	}
 
-	OBJ firstObj = FIRST(listOfArguments);
-	OBJ rest = REST(listOfArguments);
-	OBJ secondObj = FIRST(rest);
+	OBJ secondObj = popFromEvalStack();
+	OBJ firstObj = popFromEvalStack();
+
 
 	if(firstObj == secondObj){
 		return globalTrue;
@@ -149,17 +158,18 @@ OBJ builtinEqQ(OBJ env, OBJ listOfArguments){
 	return globalFalse;
 }
 
-//(= x x)
-//predicate when you wish to test whether two numbers are equivalent.
-OBJ builtinEqualOperator(OBJ env, OBJ listOfArguments){
-	(void)env; //removes warning: unused parameter env
-	if(!hasTwoArguments(listOfArguments)){
-		return newYbError("builtin (=): expects exactly two arguments");
-	}
+//------------------------
+// (= x x)
+// compare if two numbers are equivalent.
+// only for numbers
+//------------------------
+OBJ builtinEqualOperator(int numArgs){
+	if(numArgs != 2){
+			return newYbError("builtin (=): expects exactly two arguments");
+		}
 
-	OBJ firstObj = FIRST(listOfArguments);
-	OBJ rest = REST(listOfArguments);
-	OBJ secondObj = FIRST(rest);
+	OBJ secondObj = popFromEvalStack();
+	OBJ firstObj = popFromEvalStack();
 
 	//both arguments must be numbers
 	if(TYPE(firstObj)!=T_NUMBER || TYPE(secondObj)!=T_NUMBER){
@@ -186,21 +196,24 @@ OBJ builtinEqualOperator(OBJ env, OBJ listOfArguments){
 	return globalFalse;
 }
 
-//(eqv? x x)
-//predicate when you wish to test whether two non-numeric values are equivalent.
-OBJ builtinEqvQ(OBJ env, OBJ listOfArguments){
- 	 (void)env; //removes warning: unused parameter env
- 	if(!hasTwoArguments(listOfArguments)){
+//------------------------
+// (eqv? x x)
+// compare if two non-numeric values are equivalent.
+//------------------------
+OBJ builtinEqvQ(int numArgs){
+	if(numArgs != 2){
 		return newYbError("builtin (eqv?): expects exactly two arguments");
 	}
 
- 	OBJ firstObj = FIRST(listOfArguments);
-	OBJ rest = REST(listOfArguments);
-	OBJ secondObj = FIRST(rest);
+	OBJ secondObj = popFromEvalStack();
+	OBJ firstObj = popFromEvalStack();
 
 	//if both arguments are numbers
 	if((TYPE(firstObj) == T_NUMBER) && (TYPE(secondObj) == T_NUMBER)){
-		return builtinEqualOperator(env, listOfArguments);
+		//push objects back to stack to use already implemented function
+		pushToEvalStack(firstObj);
+		pushToEvalStack(secondObj);
+		return builtinEqualOperator(numArgs);
 	}
 
 	//if both arguments are strings
@@ -215,15 +228,49 @@ OBJ builtinEqvQ(OBJ env, OBJ listOfArguments){
 	//frage was ist mit anderen Objekttypen?
 }
 
-//(equal? x x)
-//Use the equal? predicate when you wish to test whether two lists, vectors, etc. are equivalent.
-/*OBJ builtinEqualQ(OBJ env, OBJ listOfArguments){
- 	 (void)env; //removes warning: unused parameter env
+//------------------------
+// (equal? x x)
+// to test if two lists, vectors, etc. are equivalent.
+//------------------------
+/*OBJ builtinEqualQ(int numArgs){
 
 }*/
 
-//-- if --//
 
+//------------------------
+// not
+// expects only one argument
+//
+// > (if (= 3 3) 1 2)
+// 1
+// > (if (not (= 3 3)) 1 2)
+// 2
+//------------------------
+OBJ builtinNot(int numArgs){
+	if(numArgs!=1){
+		return newYbError("builtin (not): epects only one argument");
+	}
+
+	OBJ obj = popFromEvalStack();
+
+	if(TYPE(obj) == T_ERROR){
+		return obj;
+	}
+
+	if(obj == globalFalse){
+		return globalTrue;
+	}
+
+	return globalFalse;
+}
+
+
+// #### syntax #######################################################################################
+
+
+//------------------------
+// if
+//------------------------
 OBJ builtinIf(OBJ env, OBJ listOfArguments){
 
 	if(TYPE(listOfArguments) != T_CONS){
@@ -257,6 +304,7 @@ OBJ builtinIf(OBJ env, OBJ listOfArguments){
 
 	return newYbError("builtin (if): condition is not a boolean");
 }
+
 
 
 /****

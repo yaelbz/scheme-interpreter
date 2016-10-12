@@ -1,8 +1,7 @@
 /*
  * evaluator.c
+ * repl --> evaluator
  *
- *  Created on: 02.10.2016
- *      Author: yael
  */
 
 #include <stdio.h>
@@ -14,67 +13,77 @@
 #include "printer.h"
 #include "symbolTable.h"
 
-//--------------- init ----------------------//
+// #### init #######################################################################################
 
-/******************
- * init builtins
- *
- ******************/
+//------------------------
+// init builtins
+//------------------------
 void initBuiltins(){
 	//functions
 	envAdd(NULL, addToSymbolTable("+"), newYbBuiltinFunction("+", &builtinPlus));
 	envAdd(NULL, addToSymbolTable("-"), newYbBuiltinFunction("-", &builtinMinus));
 	envAdd(NULL, addToSymbolTable("*"), newYbBuiltinFunction("*", &builtinMultiplication));
 	envAdd(NULL, addToSymbolTable("/"), newYbBuiltinFunction("/", &builtinDivision));
+	envAdd(NULL, addToSymbolTable("eq?"),newYbBuiltinFunction("eq?",	&builtinEqQ));
+	envAdd(NULL, addToSymbolTable("="),	newYbBuiltinFunction("=",	&builtinEqualOperator));
+	envAdd(NULL, addToSymbolTable("eqv?"),newYbBuiltinFunction("eqv?",&builtinEqvQ));
+	envAdd(NULL, addToSymbolTable("not"),newYbBuiltinFunction("not",&builtinNot));
+
 	//syntax
 	//envAdd(NULL, addToSymbolTable("define"), newYbBuiltinSyntax("define", &builtinDefine));
 	envAdd(NULL, addToSymbolTable("if"),	newYbBuiltinSyntax("if",	&builtinIf));
-	envAdd(NULL, addToSymbolTable("eq?"),	newYbBuiltinSyntax("eq?",	&builtinEqQ));
-	envAdd(NULL, addToSymbolTable("="),		newYbBuiltinSyntax("=",		&builtinEqualOperator));
-	envAdd(NULL, addToSymbolTable("eqv?"),	newYbBuiltinSyntax("eqv?",	&builtinEqvQ));
+
+
 	//quote
 	//lambda
 }
 
+//------------------------
+// init evaluator
+//------------------------
 void initEvaluator(){
 	initEvalStack();
 	initEnv();
 	initBuiltins(); //Environment and symbolTable must be initialized first!
 }
 
-//--------------- eval functions ----------------------//
+// #### eval functions #######################################################################################
 
+//------------------------
+// symbol
+//------------------------
 OBJ ybEvalSymbol(OBJ env, OBJ obj){
 	//printf("eval --- ybEvalSymbol:\n");
 	OBJ evalObj = envGet(env, obj);
-	//wenn objekt gefunden
+	//object found
 	if(evalObj) return evalObj;
 	//else error
 	return newYbError("eval: symbol could not be evaluated");
 }
 
+//------------------------
+// list
+//------------------------
 OBJ ybEvalCons(OBJ env, OBJ obj){
 	//printf("eval --- ybEvalCons:\n");
-	//first element als funktionslot abspeichern
-	OBJ evalFirst = ybEval(env, obj->u.cons.first);
 
-	//rest in ner schleife durchgehen
-	OBJ rest = obj->u.cons.rest;
+	OBJ evalFirst = ybEval(env, FIRST(obj));
+
+	OBJ rest = REST(obj);
 	int countArgs = 0;
-	switch(evalFirst->u.any.type){
+	switch(TYPE(evalFirst)){
 	case T_BUILTIN_SYNTAX:
-		//syntax aufrufen
-		//ybEnvironment env = newYbEnvironment();
-		return (*evalFirst->u.syntax.impl)(env, rest);
+		return (*evalFirst->u.builtinSyntax.impl)(env, rest);
 	case T_BUILTIN_FUNCTION:
 		while(rest->u.any.type!=T_NIL){
-			pushToEvalStack(ybEval(env, rest->u.cons.first));
+			pushToEvalStack(ybEval(env, FIRST(rest)));
 			countArgs++;
-			rest = rest->u.cons.rest;
+			rest = REST(rest);
 		}
-		//die funktion in der funktionslot ausführen, diese holt sich dann die argumente vom stack.
-		return (*evalFirst->u.fctBuiltin.impl)(countArgs);
+		return (*evalFirst->u.builtinFct.impl)(countArgs);
 	case T_USER_FUNCTION:
+		//create new env
+		//create new o
 	default:
 		//was passiert hier genau? welche Fälle könnte es noch geben?
 		//frage wenn das erste symbol in der Liste eine variable ist und kein "ausführbares" symbol dann gibt das n fehler, oder?
@@ -84,9 +93,12 @@ OBJ ybEvalCons(OBJ env, OBJ obj){
 }
 
 
-//--------------- eval ----------------------//
+// #### eval #######################################################################################
 
-
+//------------------------
+// main eval
+// called from repl
+//------------------------
 OBJ ybEval(OBJ env, OBJ obj){
 	switch(TYPE(obj)){
 	case T_SYMBOL:
