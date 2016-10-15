@@ -1,8 +1,6 @@
 /*
  * evalStack.c
  *
- *  Created on: 03.10.2016
- *      Author: yael
  */
 
 #include "global.h"
@@ -15,16 +13,15 @@ int evalStackPointer;
 
 
 void initEvalStack(){
-	//evalStack initialisieren
 	evalStack = (OBJ*)malloc(sizeof(OBJ)*EVAL_STACK_INITIAL_SIZE);
-	//der stackPointer zeigt immer auf das nächste freie Feld
+	//stackPointer points to next empty slot
 	evalStackPointer=0;
 }
 
 void pushToEvalStack(OBJ obj){
 	if(evalStackPointer>=EVAL_STACK_INITIAL_SIZE){
-		//stack voll
-		//todo stack vergrößern
+		//stack full
+		//todo enlarge stack
 		ybThrowError(-1, "eval: stack overflow");
 	}
 	evalStack[evalStackPointer]=obj;
@@ -32,7 +29,7 @@ void pushToEvalStack(OBJ obj){
 }
 
 OBJ popFromEvalStack(){
-	//wenn der stackPointer=0 ist, dann ist der Stack leer
+	//if stackPointer = 0 --> stack empty
 	if(evalStackPointer>0){
 		evalStackPointer--;
 		return evalStack[evalStackPointer];

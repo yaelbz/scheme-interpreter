@@ -11,6 +11,8 @@
 #include "global.h"
 #include "evaluator.h"
 #include "evalStack.h"
+#include "environment.h"
+#include "symbolTable.h"
 
 // #### functions #######################################################################################
 
@@ -251,6 +253,51 @@ OBJ builtinNot(int numArgs){
 	return globalFalse;
 }
 
+//------------------------
+// cons
+//------------------------
+OBJ builtinCons(int numArgs){
+	if(numArgs != 2){
+		return newYbError("builtin (cons): excepts two arguments");
+	}
+
+	OBJ rest = popFromEvalStack();
+	OBJ first = popFromEvalStack();
+
+	return newYbCons(first, rest);
+
+}
+
+//------------------------
+// car
+//------------------------
+OBJ builtinCar(int numArgs){
+	if(numArgs != 1){
+		return newYbError("biultin (car): excepts one argument");
+	}
+	OBJ obj = popFromEvalStack();
+	if(TYPE(obj) == T_CONS){
+		return FIRST(obj);
+	}
+	return newYbError("builtin (car); object not a cons");
+}
+
+//------------------------
+// cdr
+//------------------------
+OBJ builtinCdr(int numArgs){
+	if(numArgs != 1){
+		return newYbError("biultin (cdr): excepts one argument");
+	}
+	OBJ obj = popFromEvalStack();
+	if(TYPE(obj) == T_CONS){
+		return REST(obj);
+	}
+	return newYbError("builtin (cdr); object not a cons");
+
+}
+
+
 
 // #### syntax #######################################################################################
 
@@ -294,32 +341,11 @@ OBJ builtinIf(OBJ env, OBJ objList){
 
 
 
-/****
- * Gittinger define-function nimmt als Parameter eine environment und eine Argumentenliste (und nicht die numArgs)
- */
-/*
-OBJ builtinDefine(OBJ env, OBJ listOfArguments){
-	OBJ obj;
 
-
-
-	Fälle:
-	1. wenn nur ein Argument --> Fehler. Define braucht mind. zwei Argumente
-	2. Wenn erstes Argument ein Symbol
-		Dann werden die restlichen Argumente an dieses Symbol gebunden?
-		laut gittinger muss es dann exakt zwei argumente geben
-		Bis nil?
-	3. Wenn erstes Argument ein Cons
-		Was heißt das dann?
-		Dann wirds ne user defined function. Der User will eine fkt definieren
-	4. wenn das erste Argument etwas anderes ist --> Fehler! (zb nummer oder string)
-
-
-	return obj;
-}
-
-*/
-
+//------------------------
+// count defines
+// --> helper function for lambda
+//------------------------
 static int countDefines(OBJ bodyList) {
 	int count = 0;
 
@@ -337,12 +363,9 @@ static int countDefines(OBJ bodyList) {
 }
 
 
-/****
- * lambda
- * (lambda kw-formals body ...+)
- * macht funktion (ohne namen)
- */
-
+//------------------------
+// lambda
+//------------------------
 OBJ builtinLambda(OBJ env, OBJ objList){
 
 	if(TYPE(objList) != T_CONS){
@@ -362,5 +385,48 @@ OBJ builtinLambda(OBJ env, OBJ objList){
 	OBJ udfObj =  newYbUserDefinedFunction("unnamed", env, parameterList, bodyList, countDefines(bodyList));
 
 	return udfObj;
+}
+
+
+//------------------------
+// define
+//------------------------
+OBJ builtinDefine(OBJ env, OBJ listOfArguments){
+
+	if(TYPE(listOfArguments) != T_CONS){
+		return newYbError("builtin (define): excepts at least two arguments");
+	}
+
+	OBJ firstObj = FIRST(listOfArguments);
+	OBJ secondObj = REST(listOfArguments);
+
+	switch (TYPE(firstObj)) {
+		case T_SYMBOL:
+			//when first Obj is a symbol, there must be only one more object
+			if(REST(secondObj) == globalNil){
+				//new binding in env
+				envAdd(env, addToSymbolTable(firstObj->u.symbol.name), ybEval(env, FIRST(secondObj)));
+				return globalNil; //todo return globalVoid
+			}
+			return newYbError("builtin (define): excepts two arguments");
+		case T_CONS:
+		{
+			OBJ lambdaArgs = newYbCons(REST(firstObj), secondObj);
+			OBJ udfValue = builtinLambda(env, lambdaArgs);
+			OBJ udfKey = FIRST(firstObj);
+			if(TYPE(udfKey) == T_SYMBOL){
+				if(TYPE(udfValue) == T_USER_FUNCTION){
+					envAdd(env, udfKey, udfValue);
+					return globalNil; //todo return globalVoid
+				}
+				//forward error
+				return udfValue;
+			}
+			return newYbError("builtin (define): identifier not a symbol");
+		}
+		default:
+			//error
+			return newYbError("builtin (define); error");
+	}
 }
 

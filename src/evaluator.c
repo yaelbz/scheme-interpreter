@@ -19,6 +19,11 @@
 // init builtins
 //------------------------
 void initBuiltins(){
+	//variables for testing
+	envAdd(NULL, addToSymbolTable("x"), newYbIntNumber(10));
+	envAdd(NULL, addToSymbolTable("y"), newYbIntNumber(20));
+	envAdd(NULL, addToSymbolTable("c"), newYbCons(newYbIntNumber(1), newYbIntNumber(2)));
+
 	//functions
 	envAdd(NULL, addToSymbolTable("+"), newYbBuiltinFunction("+", &builtinPlus));
 	envAdd(NULL, addToSymbolTable("-"), newYbBuiltinFunction("-", &builtinMinus));
@@ -28,9 +33,12 @@ void initBuiltins(){
 	envAdd(NULL, addToSymbolTable("="),	newYbBuiltinFunction("=",	&builtinEqualOperator));
 	envAdd(NULL, addToSymbolTable("eqv?"),newYbBuiltinFunction("eqv?",&builtinEqvQ));
 	envAdd(NULL, addToSymbolTable("not"),newYbBuiltinFunction("not",&builtinNot));
+	envAdd(NULL, addToSymbolTable("cons"),newYbBuiltinFunction("cons",&builtinCons));
+	envAdd(NULL, addToSymbolTable("car"),newYbBuiltinFunction("car",&builtinCar));
+	envAdd(NULL, addToSymbolTable("cdr"),newYbBuiltinFunction("cdr",&builtinCdr));
 
 	//syntax
-	//envAdd(NULL, addToSymbolTable("define"), newYbBuiltinSyntax("define", &builtinDefine));
+	envAdd(NULL, addToSymbolTable("define"), newYbBuiltinSyntax("define", &builtinDefine));
 	envAdd(NULL, addToSymbolTable("lambda"), newYbBuiltinSyntax("lambda", &builtinLambda));
 	envAdd(NULL, addToSymbolTable("if"),	newYbBuiltinSyntax("if",	&builtinIf));
 
@@ -93,7 +101,7 @@ OBJ ybEvalCons(OBJ env, OBJ obj){
 			if(TYPE(restArgList) != T_CONS){
 				return newYbError("eval: function expects %d arguments", numParams);
 			}
-			OBJ evaluatedArg = ybEval(env, FIRST(restArgList)); //frage richtig dass es hier env ist und nicht localEnv?
+			OBJ evaluatedArg = ybEval(env, FIRST(restArgList));
 			envAdd(localEnv, FIRST(restParamList), evaluatedArg);
 			restArgList = REST(restArgList);
 			restParamList = REST(restParamList);
