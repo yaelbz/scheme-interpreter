@@ -1,10 +1,7 @@
 /*
  * reader.c
- * Reader-Implementierung
+ * repl --> reader
  *
- *
- *  Created on: 01.09.2016
- *      Author: yael
  */
 
 #include <stdio.h>
@@ -21,6 +18,7 @@ static int charStackPtr = -1;
 static int charStack[CHARSTACK_SIZE];
 
 //--------------- initialization ----------------------//
+// #### init ##########################################################################################
 
 void initReader() {
 	initSymbolTable();
@@ -31,7 +29,7 @@ void flushReaderInputStream() {
 	charStackPtr = -1;
 }
 
-//--------------- helper functions ----------------------//
+// #### helper functions ##########################################################################################
 
 bool isBinaryDigit(int ch){
 	return (ch>='0' && ch<='1');
@@ -69,23 +67,27 @@ bool isWhitespace(int ch){
 	return (ch==' ' || ch=='\n' || ch=='\t' || ch=='\r');
 }
 
+//------------------------
+// from: http://www.scheme.com/tspl2d/grammar.html --> identifier
+// <letter> | ! | $ | % | & | * | / | : | < | = | > | ? | ~ | _ | ^
+// + | - | . | # --> speciel forms
+//------------------------
 bool isSymbolInitialChar(int ch){
-	//aus: http://www.scheme.com/tspl2d/grammar.html --> identifier
-	//<letter> | ! | $ | % | & | * | / | : | < | = | > | ? | ~ | _ | ^
-	// + | - | . --> prüfung auf Sonderfälle in ybReadSymbol
 	return (ch=='!' || ch=='$' || ch=='%' || ch=='&' || ch=='*' || ch=='/' ||
 			ch==':' || ch=='<' || ch=='=' || ch=='>' || ch=='?' || ch=='~' ||
 			ch=='^' || ch=='_' || ch=='.' || ch=='+' || ch=='-' ||
 			isLetter(ch));
 }
 
+//------------------------
+// from: http://www.scheme.com/tspl2d/grammar.html --> identifier
+// <initial> | <digit>
+//------------------------
 bool isSymbolSubsequentChar(int ch){
-	//aus: http://www.scheme.com/tspl2d/grammar.html --> identifier
-	//<initial> | <digit>
 	return (isSymbolInitialChar(ch) || isDecimalDigit(ch));
 }
 
-//--------------- get/push char ----------------------//
+// #### get/push char ##########################################################################################
 
 void pushCharBack(int ch){
 	if(charStackPtr >= CHARSTACK_SIZE){
@@ -106,6 +108,7 @@ int getNextRelevantChar(FILE* inputStream){
 		ch = getc(inputStream);
 	}
 	//Kommentare ignorieren: geht nur, solange nur ein Zeichen back gepushed wird
+	//todo problem when in string. e.g. "str;ng" --> should be read as string
 	if(ch==';') {
 		while(ch != '\n') {
 			ch = getc(inputStream);
@@ -127,8 +130,12 @@ int getNextRelevantCharWithoutWhitespaces(FILE* inputStream){
 	return ch;
 }
 
-//--------------- read functions ----------------------//
+// #### read functions ##########################################################################################
 
+
+//------------------------
+// read list
+//------------------------
 OBJ ybReadList(FILE* inputStream){
 	int ch = getNextRelevantCharWithoutWhitespaces(inputStream);
 	if(ch==')'){
@@ -259,7 +266,14 @@ OBJ ybReadNumberHexadecimal(FILE* inputStream) {
  * am ende speicher freigeben mit free
  * todo: strings mit ; drinnen?
  ******************/
+//------------------------
+// read string
+//------------------------
 OBJ ybReadString(FILE* inputStream){
+	//todo unbegrenzte array-länge fürs string:
+	//initialisieren mit malloc
+	//mit realloc den speicher in der schleife erweitern
+	//am ende speicher freigeben mit free
 	OBJ obj;
 	//TODO: dynamisch verwalten
 	char val[100];
@@ -276,9 +290,9 @@ OBJ ybReadString(FILE* inputStream){
 	return obj;
 }
 
-/******************
- * read symbol
- ******************/
+//------------------------
+// read symbol
+//------------------------
 OBJ ybReadSymbol(FILE* inputStream){
 	OBJ obj;
 	char val[100];
@@ -300,7 +314,8 @@ OBJ ybReadSymbol(FILE* inputStream){
 		p++;
 		ch=getNextRelevantChar(inputStream);
 	}
-	*p='\0'; //damit klar ist wann der string zuende ist
+	//end of string
+	*p='\0';
 	pushCharBack(ch);
 
 	if((val[0]=='+' || val[0]=='-') && val[1]!='\0'){
@@ -316,21 +331,21 @@ OBJ ybReadSymbol(FILE* inputStream){
 }
 
 
-//--------------- Read ----------------------//
+// #### read ##########################################################################################
 
-/******************
- * main read function
- * called from ybscheme
- ******************/
+//------------------------
+// main read
+// called from repl
+//------------------------
 OBJ ybRead(FILE* inputStream){
 	int ch = getNextRelevantCharWithoutWhitespaces(inputStream);
 
-	//Liste
+	//list
 	if(ch=='('){
 		return ybReadList(inputStream);
 	}
 
-	//String
+	//string
 	if(ch=='"'){
 		return ybReadString(inputStream);
 	}

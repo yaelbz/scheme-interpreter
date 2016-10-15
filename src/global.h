@@ -86,6 +86,14 @@ struct ybBuiltinSyntax {
 	ybSyntaxPtr impl; //implementation
 };
 
+/*
+struct ybUserFunction {
+	objType type;
+	ybEnvironment localEnv;
+	char *name;
+	ybSyntaxPtr impl; //implementation
+};
+*/
 typedef struct {
 	OBJ key;
 	OBJ value;
@@ -111,8 +119,8 @@ struct ybObject {
 		struct ybSymbol 	 symbol;
 		//struct ybBool		 boolean;
 		struct ybCons   	 cons;
-		struct ybBuiltinFunction  fctBuiltin;
-		struct ybBuiltinSyntax    syntax;
+		struct ybBuiltinFunction  builtinFct;
+		struct ybBuiltinSyntax    builtinSyntax;
 		ybEnvironment             environment;
 		//struct ybUserFuntion 	fctUser;
 	} u;

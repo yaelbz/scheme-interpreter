@@ -28,14 +28,14 @@ all: ybscheme
 # Tool invocations
 ybscheme: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: MacOS X C Linker'
+	@echo 'Invoking: GCC C Linker'
 	gcc  -o "ybscheme" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) ybscheme
+	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) ybscheme
 	-@echo ' '
 
 .PHONY: all clean dependents

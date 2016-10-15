@@ -16,21 +16,24 @@
 OBJ globalEnv;
 int globalEnvSize;
 
-/******************
- * init Environment
- *
- ******************/
+// #### init #######################################################################################
+
+
+//------------------------
+// init
+//------------------------
 void initEnv(){
 	//printf("env --- initEnv\n");
 
-	//global environment initialisieren
 	globalEnv = newYbEnvironment(GLOBALENV_INITIAL_SIZE, NULL);
 }
 
-/******************
- * add to main Environment
- *
- ******************/
+// #### add #######################################################################################
+
+
+//------------------------
+// add to hashed environment
+//------------------------
 void globalEnvAdd(OBJ env, OBJ key, OBJ value){
 
 	int startIndex = (long)key % env->u.environment.size;
@@ -52,7 +55,7 @@ void globalEnvAdd(OBJ env, OBJ key, OBJ value){
 			env->u.environment.entries[searchIndex].value = value;
 			env->u.environment.entryCount++;
 			if(env->u.environment.entryCount >= env->u.environment.size*.75){
-				//todo rehash wenn env 3/4 voll
+				//todo rehash when env 3/4 full
 			}
 			return;
 		}
@@ -65,11 +68,10 @@ void globalEnvAdd(OBJ env, OBJ key, OBJ value){
 	}
 }
 
-/******************
- * add to Environment
- * mit optionalem parameter env. wenn nichts mitgegeben wird, dann wird in die main env geschrieben
- * frage ist das gut so oder ist das unsicher?
- ******************/
+//------------------------
+// add to environment
+//
+//------------------------
 void envAdd(OBJ env, OBJ key, OBJ value){
 	if(env == NULL) {
 		env = globalEnv;
@@ -80,19 +82,17 @@ void envAdd(OBJ env, OBJ key, OBJ value){
 	if(env == globalEnv) {
 		globalEnvAdd(env, key, value);
 	} else {
-		//local environment
+		//todo add to local/unhashed environment
 	}
 
-	//else
-	//wenn es noch freie slots in der env gibt -> wenn länge des entries-array kleiner size
-	//env->entries[?].key = key;
-	//env->entries[?].value = value;
 }
 
-/******************
- * get from main Environment
- *
- ******************/
+// #### get #######################################################################################
+
+
+//------------------------
+// get from hashed environment
+//------------------------
 OBJ globalEnvGet(OBJ env, OBJ key){
 	//printf("env --- envGet:\n");
 	int startIndex = (long)key % env->u.environment.size;
@@ -118,10 +118,10 @@ OBJ globalEnvGet(OBJ env, OBJ key){
 	return newYbError("env: searched key not found since mainEnv is full. check envAdd -> rehash");
 }
 
-/******************
- * get from Environment
- *
- ******************/
+
+//------------------------
+// get from environment
+//------------------------
 OBJ envGet(OBJ env, OBJ key){
 	if(env == NULL) {
 		env = globalEnv;
@@ -129,7 +129,7 @@ OBJ envGet(OBJ env, OBJ key){
 	if(env == globalEnv) {
 		return globalEnvGet(env, key);
 	} else {
-		//todo: local environment
+		//todo: get from local/unhashed environment
 		return globalEnvGet(env, key);
 	}
 }
