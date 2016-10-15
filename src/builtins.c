@@ -116,19 +116,6 @@ OBJ builtinDivision(int numArgs){
 
 //equal - helper functions
 
-bool hasTwoArguments(OBJ listOfArguments){
-	if(TYPE(listOfArguments) != T_CONS){
-		return false;
-	}
-
-	if(TYPE(REST(listOfArguments)) != T_CONS){
-		//only one argument
-		return false;
-	}
-
-	//false: more than two arguments
-	return (REST(REST(listOfArguments)) == globalNil);
-}
 
 //------------------------
 // todo source?
@@ -271,24 +258,24 @@ OBJ builtinNot(int numArgs){
 //------------------------
 // if
 //------------------------
-OBJ builtinIf(OBJ env, OBJ listOfArguments){
+OBJ builtinIf(OBJ env, OBJ objList){
 
-	if(TYPE(listOfArguments) != T_CONS){
+	if(TYPE(objList) != T_CONS){
 		return newYbError("builtin (if): expects two or three arguments");
 	}
 
-	OBJ conditionExpr = FIRST(listOfArguments);
-	if(TYPE(REST(listOfArguments)) != T_CONS){
+	OBJ conditionExpr = FIRST(objList);
+	if(TYPE(REST(objList)) != T_CONS){
 		return newYbError("builtin (if): expects two or three arguments");
 	}
-	listOfArguments = REST(listOfArguments);
+	objList = REST(objList);
 
-	OBJ trueExpr = FIRST(listOfArguments);
+	OBJ trueExpr = FIRST(objList);
 	OBJ falseExpr = globalNil;
-	if(TYPE(REST(listOfArguments)) == T_CONS){
-		listOfArguments = REST(listOfArguments);
-		falseExpr = FIRST(listOfArguments);
-		if(REST(listOfArguments) != globalNil){
+	if(TYPE(REST(objList)) == T_CONS){
+		objList = REST(objList);
+		falseExpr = FIRST(objList);
+		if(REST(objList) != globalNil){
 			return newYbError("builtin (if): expects two or three arguments");
 		}
 	}
@@ -330,17 +317,50 @@ OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 
 	return obj;
 }
+
 */
+
+static int countDefines(OBJ bodyList) {
+	int count = 0;
+
+	while (bodyList != globalNil) {
+		OBJ first = FIRST(bodyList);
+		if(TYPE(first) == T_CONS){
+			if (FIRST(first) == globalDefine) {
+				count++;
+			}
+		}
+
+		bodyList = REST(bodyList);
+	}
+	return count;
+}
+
+
 /****
  * lambda
  * (lambda kw-formals body ...+)
  * macht funktion (ohne namen)
  */
-/*
-OBJ builtinLambda(int numArgs){
-	OBJ obj;
 
+OBJ builtinLambda(OBJ env, OBJ objList){
 
-	return obj;
+	if(TYPE(objList) != T_CONS){
+		return newYbError("builtin (lambda): expects at least two arguments");
+	}
+
+	OBJ parameterList = FIRST(objList);
+	OBJ bodyList = REST(objList);
+
+	if(TYPE(parameterList) != T_CONS){
+		return newYbError("builtin (lambda): must have a list of parameter");
+	}
+	if(TYPE(bodyList) != T_CONS){
+		return newYbError("builtin (lambda): must have a body");
+	}
+
+	OBJ udfObj =  newYbUserDefinedFunction("unnamed", env, parameterList, bodyList, countDefines(bodyList));
+
+	return udfObj;
 }
-*/
+

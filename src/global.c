@@ -10,6 +10,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include "global.h"
+#include "symbolTable.h"
 
 // #### init #######################################################################################
 
@@ -25,6 +26,9 @@ void initGlobals(){
 
 	globalFalse = (OBJ)(malloc( sizeof(struct ybAny)));
 	TYPE(globalFalse) = T_FALSE;
+
+	initSymbolTable();
+	globalDefine = addToSymbolTable("define");
 }
 
 // #### constructor #######################################################################################
@@ -144,6 +148,26 @@ OBJ newYbBuiltinFunction(char *name, ybFctPtr implementation){
 }
 
 //------------------------
+// new user defined function
+//------------------------
+OBJ newYbUserDefinedFunction(char *name, OBJ env, OBJ parameterList, OBJ bodyList, int numDefs){
+	struct ybUserFunction *obj;
+	obj = (struct ybUserFunction *)(malloc(sizeof(struct ybUserFunction)));
+	obj->type=T_USER_FUNCTION;
+	obj->name = name;
+	obj->env = env;
+	obj->numDefs = numDefs;
+	obj->parameterList = parameterList;
+	obj->numParameter = 0;
+	while(parameterList != globalNil){
+		obj->numParameter++;
+		parameterList=REST(parameterList);
+	}
+	obj->bodyList = bodyList;
+	return (OBJ)obj;
+}
+
+//------------------------
 // new builtin syntax
 //------------------------
 OBJ newYbBuiltinSyntax(char *name, ybSyntaxPtr implementation){
@@ -160,7 +184,6 @@ OBJ newYbBuiltinSyntax(char *name, ybSyntaxPtr implementation){
 //------------------------
 OBJ newYbEnvironment(int envSize, OBJ parentEnv){
 	ybEnvironment *obj;
-	//malloc, gittinger style:	int byteSize = offsetof(struct schemeEnvironment, slots) + sizeof(SCM_ENV_ENTRY)*numSlots;
 	obj = (ybEnvironment *)(malloc(sizeof(ybEnvironment)+sizeof(keyValuePair)*envSize));
 	obj->type=T_ENVIRONMENT;
 	obj->size=envSize;

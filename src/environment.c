@@ -69,6 +69,26 @@ void globalEnvAdd(OBJ env, OBJ key, OBJ value){
 }
 
 //------------------------
+// add to local environment
+//------------------------
+void localEnvAdd(OBJ env, OBJ key, OBJ value){
+	for (int i = 0; i < env->u.environment.size; ++i) {
+		if(env->u.environment.entries[i].key == key){
+			//replace value
+			env->u.environment.entries[i].value = value;
+			return;
+		}
+		else if(env->u.environment.entries[i].key == NULL){
+			//empty slot
+			env->u.environment.entries[i].key = key;
+			env->u.environment.entries[i].value = value;
+			return;
+		}
+	}
+	ybThrowError(-1, "localEnv full");
+}
+
+//------------------------
 // add to environment
 //
 //------------------------
@@ -77,12 +97,10 @@ void envAdd(OBJ env, OBJ key, OBJ value){
 		env = globalEnv;
 	}
 
-	//TODO: Type prüfen, es könnte ja ein ganz anderes objekt sein...
-
 	if(env == globalEnv) {
 		globalEnvAdd(env, key, value);
 	} else {
-		//todo add to local/unhashed environment
+		localEnvAdd(env, key, value);
 	}
 
 }
@@ -117,6 +135,19 @@ OBJ globalEnvGet(OBJ env, OBJ key){
 	}
 }
 
+//------------------------
+// get from local environment
+//------------------------
+OBJ localEnvGet(OBJ env, OBJ key){
+	for (int i = 0; i < env->u.environment.size; ++i) {
+		if(env->u.environment.entries[i].key == key){
+			//return value
+			return env->u.environment.entries[i].value;
+		}
+	}
+	//key does not exist in env
+	return envGet(env->u.environment.parentEnv, key);
+}
 
 //------------------------
 // get from environment
@@ -128,7 +159,6 @@ OBJ envGet(OBJ env, OBJ key){
 	if(env == globalEnv) {
 		return globalEnvGet(env, key);
 	} else {
-		//todo: get from local/unhashed environment
-		return globalEnvGet(env, key);
+		return localEnvGet(env, key);
 	}
 }
