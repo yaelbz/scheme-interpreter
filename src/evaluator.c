@@ -19,6 +19,11 @@
 // init builtins
 //------------------------
 void initBuiltins(){
+	//variables for testing
+	envAdd(NULL, addToSymbolTable("x"), newYbIntNumber(10));
+	envAdd(NULL, addToSymbolTable("y"), newYbIntNumber(20));
+	envAdd(NULL, addToSymbolTable("c"), newYbCons(newYbIntNumber(1), newYbIntNumber(2)));
+
 	//functions
 	envAdd(NULL, addToSymbolTable("+"), newYbBuiltinFunction("+", &builtinPlus));
 	envAdd(NULL, addToSymbolTable("-"), newYbBuiltinFunction("-", &builtinMinus));
@@ -28,14 +33,17 @@ void initBuiltins(){
 	envAdd(NULL, addToSymbolTable("="),	newYbBuiltinFunction("=",	&builtinEqualOperator));
 	envAdd(NULL, addToSymbolTable("eqv?"),newYbBuiltinFunction("eqv?",&builtinEqvQ));
 	envAdd(NULL, addToSymbolTable("not"),newYbBuiltinFunction("not",&builtinNot));
+	envAdd(NULL, addToSymbolTable("cons"),newYbBuiltinFunction("cons",&builtinCons));
+	envAdd(NULL, addToSymbolTable("car"),newYbBuiltinFunction("car",&builtinCar));
+	envAdd(NULL, addToSymbolTable("cdr"),newYbBuiltinFunction("cdr",&builtinCdr));
 
 	//syntax
-	//envAdd(NULL, addToSymbolTable("define"), newYbBuiltinSyntax("define", &builtinDefine));
+	envAdd(NULL, addToSymbolTable("define"), newYbBuiltinSyntax("define", &builtinDefine));
+	envAdd(NULL, addToSymbolTable("lambda"), newYbBuiltinSyntax("lambda", &builtinLambda));
 	envAdd(NULL, addToSymbolTable("if"),	newYbBuiltinSyntax("if",	&builtinIf));
 
 
 	//quote
-	//lambda
 }
 
 //------------------------
@@ -67,23 +75,50 @@ OBJ ybEvalSymbol(OBJ env, OBJ obj){
 OBJ ybEvalCons(OBJ env, OBJ obj){
 	//printf("eval --- ybEvalCons:\n");
 
-	OBJ evalFirst = ybEval(env, FIRST(obj));
+	OBJ evaluatedFirst = ybEval(env, FIRST(obj));
 
 	OBJ rest = REST(obj);
 	int countArgs = 0;
-	switch(TYPE(evalFirst)){
+	switch(TYPE(evaluatedFirst)){
 	case T_BUILTIN_SYNTAX:
-		return (*evalFirst->u.builtinSyntax.impl)(env, rest);
+		return (*evaluatedFirst->u.builtinSyntax.impl)(env, rest);
 	case T_BUILTIN_FUNCTION:
 		while(rest->u.any.type!=T_NIL){
 			pushToEvalStack(ybEval(env, FIRST(rest)));
 			countArgs++;
 			rest = REST(rest);
 		}
-		return (*evalFirst->u.builtinFct.impl)(countArgs);
-	case T_USER_FUNCTION:
-		//create new env
-		//create new o
+		return (*evaluatedFirst->u.builtinFct.impl)(countArgs);
+	case T_USER_FUNCTION: {
+		int numParams = evaluatedFirst->u.userFct.numParameter;
+		int numDefs = evaluatedFirst->u.userFct.numDefs;
+		OBJ localEnv = newYbEnvironment(numParams+numDefs, evaluatedFirst->u.userFct.env);
+		OBJ restParamList = evaluatedFirst->u.userFct.parameterList;
+		OBJ restArgList = rest;
+
+		//todo check if paramList and argList have same length
+		while(restParamList != globalNil){
+			if(TYPE(restArgList) != T_CONS){
+				return newYbError("eval: function expects %d arguments", numParams);
+			}
+			OBJ evaluatedArg = ybEval(env, FIRST(restArgList));
+			envAdd(localEnv, FIRST(restParamList), evaluatedArg);
+			restArgList = REST(restArgList);
+			restParamList = REST(restParamList);
+		}
+
+		if(restArgList != globalNil){
+			return newYbError("eval: function expects %d arguments", numParams);
+		}
+
+		OBJ restBodyList = evaluatedFirst->u.userFct.bodyList;
+		OBJ returnValue;
+		while(restBodyList != globalNil){
+			returnValue = ybEval(localEnv, FIRST(restBodyList));
+			restBodyList = REST(restBodyList);
+		}
+		return returnValue;
+	}
 	default:
 		//was passiert hier genau? welche Fälle könnte es noch geben?
 		//frage wenn das erste symbol in der Liste eine variable ist und kein "ausführbares" symbol dann gibt das n fehler, oder?

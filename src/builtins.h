@@ -17,11 +17,14 @@ OBJ builtinEqQ(int);
 OBJ builtinEqualOperator(int);
 OBJ builtinEqualQ(int);
 OBJ builtinNot(int);
+OBJ builtinCons(int);
+OBJ builtinCar(int);
+OBJ builtinCdr(int);
 
 
 OBJ builtinDefine(OBJ, OBJ);
 OBJ builtinIf(OBJ, OBJ);
-OBJ builtinLambda(int);
+OBJ builtinLambda(OBJ, OBJ);
 
 
 

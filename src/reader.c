@@ -21,7 +21,6 @@ static int charStack[CHARSTACK_SIZE];
 // #### init ##########################################################################################
 
 void initReader() {
-	initSymbolTable();
 	flushReaderInputStream();
 }
 

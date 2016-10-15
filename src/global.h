@@ -86,14 +86,17 @@ struct ybBuiltinSyntax {
 	ybSyntaxPtr impl; //implementation
 };
 
-/*
+
 struct ybUserFunction {
 	objType type;
-	ybEnvironment localEnv;
+	OBJ env;
+	int numDefs;
 	char *name;
-	ybSyntaxPtr impl; //implementation
+	OBJ parameterList;
+	int numParameter;
+	OBJ bodyList;
 };
-*/
+
 typedef struct {
 	OBJ key;
 	OBJ value;
@@ -122,7 +125,7 @@ struct ybObject {
 		struct ybBuiltinFunction  builtinFct;
 		struct ybBuiltinSyntax    builtinSyntax;
 		ybEnvironment             environment;
-		//struct ybUserFuntion 	fctUser;
+		struct ybUserFunction 	userFct;
 	} u;
 };
 
@@ -136,6 +139,7 @@ struct ybObject {
 OBJ globalNil;
 OBJ globalTrue;
 OBJ globalFalse;
+OBJ globalDefine;
 
 // prototypes
 
@@ -149,6 +153,7 @@ OBJ newYbString(char *);
 OBJ newYbSymbol(char *);
 OBJ newYbCons(OBJ, OBJ);
 OBJ newYbBuiltinFunction(char *, ybFctPtr);
+OBJ newYbUserDefinedFunction(char *, OBJ, OBJ, OBJ, int);
 OBJ newYbBuiltinSyntax(char *, ybSyntaxPtr);
 OBJ newYbEnvironment(int, OBJ);
 
