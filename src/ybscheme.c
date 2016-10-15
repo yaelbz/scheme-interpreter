@@ -30,9 +30,12 @@ int main(){
 		OBJ evalObj = ybEval(NULL, readObj);
 		//print
 		ybPrint(evalObj);
+		if(TYPE(evalObj) == T_ERROR) {
+			flushReaderInputStream();
+		}
 	}
 
-	//todo clean up free memory - durch sig9
+	//todo: clean up free memory - durch sig9
 
 
 	return 0;

@@ -33,7 +33,7 @@ void initEnv(){
  ******************/
 void globalEnvAdd(OBJ env, OBJ key, OBJ value){
 
-	int startIndex = (int)key % env->u.environment.size;
+	int startIndex = (long)key % env->u.environment.size;
 	int searchIndex = startIndex;
 
 	//printf("env --- envAdd 0x%08x\n", startIndex);
@@ -95,7 +95,7 @@ void envAdd(OBJ env, OBJ key, OBJ value){
  ******************/
 OBJ globalEnvGet(OBJ env, OBJ key){
 	//printf("env --- envGet:\n");
-	int startIndex = (int)key % env->u.environment.size;
+	int startIndex = (long)key % env->u.environment.size;
 	int searchIndex = startIndex;
 
 	OBJ storedKey;
@@ -115,6 +115,7 @@ OBJ globalEnvGet(OBJ env, OBJ key){
 			return newYbError("env: searched key not found since mainEnv is full. check envAdd -> rehash");
 		}
 	}
+	return newYbError("env: searched key not found since mainEnv is full. check envAdd -> rehash");
 }
 
 /******************

@@ -11,8 +11,8 @@
 
 #include "global.h"
 
-
 void initReader();
+void flushReaderInputStream();
 OBJ ybRead(FILE*);
 
 

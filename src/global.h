@@ -46,11 +46,11 @@ struct ybError {
 
 struct ybNumber {
 	objType type;
+	bool isInteger;
 	union {
 		long   i;
 		double f;
 	} value;
-	bool isInteger;
 };
 
 struct ybSymbol {
@@ -129,16 +129,16 @@ OBJ globalNil;
 OBJ globalTrue;
 OBJ globalFalse;
 
-// prototypen
+// prototypes
 
 void initGlobals();
 
 OBJ newYbError(const char *, ...);
 OBJ newYbIntNumber(long);
+OBJ newYbFloatNumberFromInts(long, long);
 OBJ newYbFloatNumber(double);
 OBJ newYbString(char *);
 OBJ newYbSymbol(char *);
-OBJ newYbBool(bool);
 OBJ newYbCons(OBJ, OBJ);
 OBJ newYbBuiltinFunction(char *, ybFctPtr);
 OBJ newYbBuiltinSyntax(char *, ybSyntaxPtr);

@@ -77,7 +77,7 @@ void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 			printf("%s%ssymbol(%s)\n", indentString, prefix, obj->u.symbol.name);
 			break;
 		case T_BUILTIN_FUNCTION:
-			printf("%s%sbuiltin(%s,0x%08x)\n", indentString, prefix, obj->u.fctBuiltin.name, (int)obj->u.fctBuiltin.impl);
+			printf("%s%sbuiltin(%s,0x%08lx)\n", indentString, prefix, obj->u.fctBuiltin.name, (long)obj->u.fctBuiltin.impl);
 			break;
 		case T_CONS:
 			printf("%s%scons\n", indentString, prefix);

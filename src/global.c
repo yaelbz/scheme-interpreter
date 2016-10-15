@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdarg.h>
 #include <string.h>
 #include "global.h"
@@ -127,7 +128,6 @@ OBJ newYbBuiltinSyntax(char *name, ybSyntaxPtr implementation){
 	obj->impl = implementation;
 	return (OBJ)obj;
 }
-
 
 OBJ newYbEnvironment(int envSize, OBJ parentEnv){
 	ybEnvironment *obj;
