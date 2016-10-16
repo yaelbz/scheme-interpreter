@@ -90,7 +90,7 @@ void rehashSymbolTable(){
 // add to table
 //------------------------
 OBJ addToSymbolTable(char *symbolName){
-	//todo rehash when env 3/4 full
+	//rehash when env 3/4 full
 	if(symbolTableFillSize > (symbolTableSize * 3 / 4)){
 		rehashSymbolTable();
 	}
