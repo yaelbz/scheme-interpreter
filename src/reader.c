@@ -14,8 +14,10 @@
 
 
 #define CHARSTACK_SIZE   2
+#define STRING_INITIAL_LENGTH 64
 static int charStackPtr = -1;
 static int charStack[CHARSTACK_SIZE];
+static bool readingString = false;
 
 // #### init ##########################################################################################
 
@@ -105,9 +107,8 @@ int getNextRelevantChar(FILE* inputStream){
 	else{
 		ch = getc(inputStream);
 	}
-	//todo problem when ; in string. e.g. "str;ng" --> should be read as string
 	//ignore comments
-	if(ch==';') {
+	if(!readingString && ch==';') {
 		while(ch != '\n') {
 			ch = getc(inputStream);
 		}
@@ -272,35 +273,30 @@ OBJ ybReadNumberHexadecimal(FILE* inputStream) {
 	return newYbIntNumber(value*sign);
 }
 
-/******************
- * read string
- * todo unbegrenzte array-länge fürs string:
- * initialisieren mit malloc
- * mit realloc den speicher in der schleife erweitern
- * am ende speicher freigeben mit free
- * todo: strings mit ; drinnen?
- ******************/
+
 //------------------------
 // read string
 //------------------------
 OBJ ybReadString(FILE* inputStream){
-	//todo unbegrenzte array-länge fürs string:
-	//initialisieren mit malloc
-	//mit realloc den speicher in der schleife erweitern
-	//am ende speicher freigeben mit free
+	readingString = true;
 	OBJ obj;
-	//TODO: dynamisch verwalten
-	char val[100];
-	char *p = val;
+	char *val = (char*)malloc(STRING_INITIAL_LENGTH*sizeof(char));
+	int valLength = STRING_INITIAL_LENGTH;
+	int countChars = 0;
 	int ch=getNextRelevantChar(inputStream);
 	while(ch != '"'){
-		*p=ch;
-		p++;
+		if(countChars>=valLength-1){
+			valLength += STRING_INITIAL_LENGTH;
+			val = (char*)realloc(val, valLength*sizeof(char));
+		}
+		val[countChars]=ch;
+		countChars++;
 		ch=getNextRelevantChar(inputStream);
 	}
-	*p='\0'; //damit klar ist wann der string zuende ist
+	val[countChars]='\0'; //end of string
 	obj = newYbString(val);
-	//free() mit dem angelegten Speicher als parameter
+	free(val);
+	readingString = false;
 	return obj;
 }
 
@@ -308,39 +304,43 @@ OBJ ybReadString(FILE* inputStream){
 // read symbol
 //------------------------
 OBJ ybReadSymbol(FILE* inputStream){
-	OBJ obj;
-	char val[100];
-	//TODO: dynamisch verwalten
-	char *p = val;
-
 	//check first char
 	int ch = getNextRelevantCharWithoutWhitespaces(inputStream);
 	if(!isSymbolInitialChar(ch)){
 		return newYbError("syntax error: not a valid symbol, starting with: %c", ch);
 	}
-	*p=ch;
-	p++;
+
+	OBJ obj;
+
+	char *val = (char*)malloc(STRING_INITIAL_LENGTH*sizeof(char));
+	int valLength = STRING_INITIAL_LENGTH;
+	val[0] = ch;
+	int countChars = 1;
 
 	//check the following chars
 	ch=getNextRelevantChar(inputStream);
 	while(isSymbolSubsequentChar(ch)){
-		*p=ch;
-		p++;
+		if(countChars>=valLength-1){
+			valLength += STRING_INITIAL_LENGTH;
+			val = (char*)realloc(val, valLength*sizeof(char));
+		}
+		val[countChars]=ch;
+		countChars++;
 		ch=getNextRelevantChar(inputStream);
 	}
-	//end of string
-	*p='\0';
+	val[countChars]='\0'; //end of string
 	pushCharBack(ch);
 
 	if((val[0]=='+' || val[0]=='-') && val[1]!='\0'){
 		return newYbError("syntax error: not a valid symbol: %s", val);
-
 	}
 	if(strcmp(val, "nil")==0){
+		free(val);
 		return globalNil;
 	}
 
 	obj = addToSymbolTable(val);
+	free(val);
 	return obj;
 }
 

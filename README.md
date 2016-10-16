@@ -7,5 +7,8 @@ Scheme interpreter written in C
 
 ##Issues
 - float
-- error handling
 - file stream
+- error handling
+-- handle memory
+-- errorNums in enum
+-- return to main execution

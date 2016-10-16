@@ -47,7 +47,6 @@ void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 	indentString[indentCount] = '\0';
 
 	if(obj){
-		//TODO der zugang zu den Objekt-tags könnte über ein Makro kürzer werden.
 		switch (obj->u.any.type) {
 		case T_ERROR:
 			printf("%s%serror(%s)\n", indentString, prefix, obj->u.error.message);

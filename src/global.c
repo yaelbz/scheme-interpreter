@@ -40,7 +40,6 @@ void initGlobals(){
 //------------------------
 // new error
 //------------------------
-//TODO: variable argument list. Wie wird da der Speicher verwaltet?
 OBJ newYbError(const char *format, ...) {
 	struct ybError *obj;
 
@@ -89,12 +88,6 @@ OBJ newYbFloatNumber(double iVal) {
 //------------------------
 OBJ newYbString(char *val){
 	struct ybString *obj;
-	/*/*
-	 * NewString sollte aber trotzdem strcpy verwenden
-	 * Um den wert zu kopieren (der übergeben wird)
-	 * Wenn in [] nichts drin steht, ist es dasselbe wie char*,
-	 * dann ist kein speicher reserviert und muss erst mit malloc angelegt werden
-	 */
 	obj = (struct ybString *)(malloc( sizeof(struct ybString)));
 	obj->type = T_STRING;
 	obj->string = (char *)(malloc( strlen(val)));
@@ -107,7 +100,6 @@ OBJ newYbString(char *val){
 //------------------------
 OBJ newYbSymbol(char *val){
 	struct ybSymbol *obj;
-	//siehe anmerkung in newString()
 	obj = (struct ybSymbol *)(malloc( sizeof(struct ybSymbol)));
 	obj->type = T_SYMBOL;
 	obj->name = (char *)(malloc( strlen(val)));
@@ -201,7 +193,30 @@ OBJ newYbEnvironment(int envSize, OBJ parentEnv){
 // #### free object #######################################################################################
 
 void freeObject(OBJ obj){
-	//todo implement freeObject
+	switch (TYPE(obj)) {
+	case T_ERROR:
+	case T_NIL:
+	case T_VOID:
+	case T_TRUE:
+	case T_FALSE:
+		break;
+	case T_CONS:
+		freeObject(FIRST(obj));
+		freeObject(REST(obj));
+		free(obj);
+		break;
+	case T_STRING:
+		free(obj->u.string.string);
+		free(obj);
+		break;
+	case T_SYMBOL:
+		free(obj->u.symbol.name);
+		free(obj);
+		break;
+	default:
+		free(obj);
+		break;
+	}
 }
 
 // #### error #######################################################################################
@@ -209,7 +224,6 @@ void freeObject(OBJ obj){
 //------------------------
 // throw error
 //------------------------
-//TODO: declare enum with errors in global header
 void ybThrowError(int ybErrNum, const char *format, ...) {
 	va_list args;
 	va_start(args, format);
@@ -221,7 +235,6 @@ void ybThrowError(int ybErrNum, const char *format, ...) {
 
     va_end(args);
 
-    //TODO: handle error, return to main execution
     if(ybErrNum < 0) {
     	exit(ybErrNum);
     }

@@ -120,7 +120,7 @@ OBJ builtinDivision(int numArgs){
 
 
 //------------------------
-// todo source?
+// compare floats
 //------------------------
 bool areFloatsEqual(double a, double b){
 	double diff = a-b;
