@@ -17,7 +17,6 @@
 static int charStackPtr = -1;
 static int charStack[CHARSTACK_SIZE];
 
-//--------------- initialization ----------------------//
 // #### init ##########################################################################################
 
 void initReader() {
@@ -69,7 +68,7 @@ bool isWhitespace(int ch){
 //------------------------
 // from: http://www.scheme.com/tspl2d/grammar.html --> identifier
 // <letter> | ! | $ | % | & | * | / | : | < | = | > | ? | ~ | _ | ^
-// + | - | . | # --> speciel forms
+// + | - | . --> special forms
 //------------------------
 bool isSymbolInitialChar(int ch){
 	return (ch=='!' || ch=='$' || ch=='%' || ch=='&' || ch=='*' || ch=='/' ||
@@ -106,8 +105,8 @@ int getNextRelevantChar(FILE* inputStream){
 	else{
 		ch = getc(inputStream);
 	}
-	//Kommentare ignorieren: geht nur, solange nur ein Zeichen back gepushed wird
-	//todo problem when in string. e.g. "str;ng" --> should be read as string
+	//todo problem when ; in string. e.g. "str;ng" --> should be read as string
+	//ignore comments
 	if(ch==';') {
 		while(ch != '\n') {
 			ch = getc(inputStream);
@@ -152,6 +151,9 @@ OBJ ybReadList(FILE* inputStream){
 
 typedef bool (*isDigitPtr)(int);
 
+//------------------------
+// read number sign
+//------------------------
 int ybReadNumberSign(int *ch, FILE* inputStream, isDigitPtr isDigitFct) {
 	int sign = 1;
 
@@ -183,48 +185,58 @@ int ybReadNumberSign(int *ch, FILE* inputStream, isDigitPtr isDigitFct) {
 	return sign;
 }
 
+//------------------------
+// read binary num
+//------------------------
 OBJ ybReadNumberBinary(FILE* inputStream) {
 	int ch = getNextRelevantChar(inputStream);
 	int sign = ybReadNumberSign(&ch, inputStream, &isBinaryDigit);
 	if(!sign) {
-		// not a number
+		//not a number
 		return globalNil;
 	}
 
 	long value = ch - '0';
 	while(isBinaryDigit(ch = getNextRelevantChar(inputStream))) {
-		// assuming compiler will optimize *2 by shift operation
+		//assuming compiler will optimize *2 by shift operation
 		value = value * 2 + (ch - '0');
 	};
 
-	// read one too much
+	//read one too much
 	pushCharBack(ch);
 	return newYbIntNumber(value*sign);
 }
+
+//------------------------
+// read octal num
+//------------------------
 OBJ ybReadNumberOctal(FILE* inputStream) {
 	int ch = getNextRelevantChar(inputStream);
 	int sign = ybReadNumberSign(&ch, inputStream, &isOctalDigit);
 	if(!sign) {
-		// not a number
+		//not a number
 		return globalNil;
 	}
 
 	long value = ch - '0';
 	while(isOctalDigit(ch = getNextRelevantChar(inputStream))) {
-		// assuming compiler will optimize *8 by shift operation
+		//assuming compiler will optimize *8 by shift operation
 		value = value * 8 + (ch - '0');
 	};
 
-	// read one too much
+	//read one too much
 	pushCharBack(ch);
 	return newYbIntNumber(value*sign);
 }
 
+//------------------------
+// read decimal num
+//------------------------
 OBJ ybReadNumberDecimal(FILE* inputStream) {
 	int ch = getNextRelevantChar(inputStream);
 	int sign = ybReadNumberSign(&ch, inputStream, &isDecimalDigit);
 	if(!sign) {
-		// not a number
+		//not a number
 		return globalNil;
 	}
 
@@ -233,26 +245,29 @@ OBJ ybReadNumberDecimal(FILE* inputStream) {
 		value = value * 10 + (ch - '0');
 	};
 
-	// read one too much
+	//read one too much
 	pushCharBack(ch);
 	return newYbIntNumber(value*sign);
 }
 
+//------------------------
+// read hex num
+//------------------------
 OBJ ybReadNumberHexadecimal(FILE* inputStream) {
 	int ch = getNextRelevantChar(inputStream);
 	int sign = ybReadNumberSign(&ch, inputStream, &isHexadecimalDigit);
 	if(!sign) {
-		// not a number
+		//not a number
 		return globalNil;
 	}
 
 	long value = convertHexDigit(ch);
 	while(isHexadecimalDigit(ch = getNextRelevantChar(inputStream))) {
-		// assuming compiler will optimize *16 by shift operation
+		//assuming compiler will optimize *16 by shift operation
 		value = value * 16 + convertHexDigit(ch);
 	}
 
-	// read one too much
+	//read one too much
 	pushCharBack(ch);
 	return newYbIntNumber(value*sign);
 }
@@ -338,6 +353,11 @@ OBJ ybReadSymbol(FILE* inputStream){
 //------------------------
 OBJ ybRead(FILE* inputStream){
 	int ch = getNextRelevantCharWithoutWhitespaces(inputStream);
+
+	//quote
+	if(ch=='\''){
+		return newYbCons(addToSymbolTable("quote"), newYbCons(ybRead(inputStream), globalNil));
+	}
 
 	//list
 	if(ch=='('){
