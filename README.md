@@ -2,6 +2,7 @@
 
 Scheme interpreter written in C
 
-##issues
+##Issues
 - float
 - error handling
+- file stream
