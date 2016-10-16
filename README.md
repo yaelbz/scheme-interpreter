@@ -2,6 +2,10 @@
 
 Scheme interpreter written in C
 
-##issues
+##setup
+- compile with -std=c99
+
+##Issues
 - float
 - error handling
+- file stream
