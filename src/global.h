@@ -17,6 +17,7 @@
 typedef enum {
 	T_ERROR=-1,
 	T_NIL=0,
+	T_VOID,
 	T_TRUE,
 	T_FALSE,
 	T_NUMBER,
@@ -137,6 +138,7 @@ struct ybObject {
 #define IS_FALSE(x)  ((x)->u.any.type == T_FALSE)
 
 OBJ globalNil;
+OBJ globalVoid;
 OBJ globalTrue;
 OBJ globalFalse;
 OBJ globalDefine;
@@ -156,6 +158,8 @@ OBJ newYbBuiltinFunction(char *, ybFctPtr);
 OBJ newYbUserDefinedFunction(char *, OBJ, OBJ, OBJ, int);
 OBJ newYbBuiltinSyntax(char *, ybSyntaxPtr);
 OBJ newYbEnvironment(int, OBJ);
+
+void freeObject(OBJ);
 
 
 

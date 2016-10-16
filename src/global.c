@@ -16,11 +16,14 @@
 // #### init #######################################################################################
 
 //------------------------
-// init global nil, true, false
+// init global nil, void, true, false
 //------------------------
 void initGlobals(){
 	globalNil = (OBJ)(malloc( sizeof(struct ybAny)));
 	TYPE(globalNil) = T_NIL;
+
+	globalVoid = (OBJ)(malloc( sizeof(struct ybAny)));
+	TYPE(globalVoid) = T_VOID;
 
 	globalTrue = (OBJ)(malloc( sizeof(struct ybAny)));
 	TYPE(globalTrue) = T_TRUE;
@@ -195,6 +198,11 @@ OBJ newYbEnvironment(int envSize, OBJ parentEnv){
 	return (OBJ)obj;
 }
 
+// #### free object #######################################################################################
+
+void freeObject(OBJ obj){
+	//todo implement freeObject
+}
 
 // #### error #######################################################################################
 

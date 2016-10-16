@@ -35,7 +35,7 @@ ybscheme: $(OBJS) $(USER_OBJS)
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) ybscheme
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) ybscheme
 	-@echo ' '
 
 .PHONY: all clean dependents

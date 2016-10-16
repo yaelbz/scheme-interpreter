@@ -41,6 +41,7 @@ void initBuiltins(){
 	envAdd(NULL, addToSymbolTable("define"), newYbBuiltinSyntax("define", &builtinDefine));
 	envAdd(NULL, addToSymbolTable("lambda"), newYbBuiltinSyntax("lambda", &builtinLambda));
 	envAdd(NULL, addToSymbolTable("if"),	newYbBuiltinSyntax("if",	&builtinIf));
+	envAdd(NULL, addToSymbolTable("quote"),	newYbBuiltinSyntax("quote",	&builtinQuote));
 
 
 	//quote

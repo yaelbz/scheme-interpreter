@@ -57,6 +57,9 @@ void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 		case T_NIL:
 			printf("%s%snil\n", indentString, prefix);
 			break;
+		case T_VOID:
+			//do nothing
+			break;
 		case T_TRUE:
 			printf("%s%strue\n", indentString, prefix);
 			break;

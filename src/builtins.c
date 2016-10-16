@@ -42,7 +42,7 @@ OBJ builtinMinus(int numArgs){
 	long diff = 0;
 
 	if(numArgs < 1){
-		return newYbError("builtin (-) needs minimum 1 argument");
+		return newYbError("builtin (-) expects at least 1 argument");
 	}
 	while(numArgs>1){
 		OBJ obj = popFromEvalStack();
@@ -92,7 +92,7 @@ OBJ builtinDivision(int numArgs){
 	double div = 1;
 
 	if(numArgs<1){
-		return newYbError("builtin (/) needs minimum 1 argument");
+		return newYbError("builtin (/) expects at least 1 argument");
 	}
 	while(numArgs>1){
 		OBJ obj = popFromEvalStack();
@@ -237,7 +237,7 @@ OBJ builtinEqvQ(int numArgs){
 //------------------------
 OBJ builtinNot(int numArgs){
 	if(numArgs!=1){
-		return newYbError("builtin (not): epects only one argument");
+		return newYbError("builtin (not): expects only one argument");
 	}
 
 	OBJ obj = popFromEvalStack();
@@ -258,7 +258,7 @@ OBJ builtinNot(int numArgs){
 //------------------------
 OBJ builtinCons(int numArgs){
 	if(numArgs != 2){
-		return newYbError("builtin (cons): excepts two arguments");
+		return newYbError("builtin (cons): expects two arguments");
 	}
 
 	OBJ rest = popFromEvalStack();
@@ -273,7 +273,7 @@ OBJ builtinCons(int numArgs){
 //------------------------
 OBJ builtinCar(int numArgs){
 	if(numArgs != 1){
-		return newYbError("biultin (car): excepts one argument");
+		return newYbError("biultin (car): expects one argument");
 	}
 	OBJ obj = popFromEvalStack();
 	if(TYPE(obj) == T_CONS){
@@ -287,7 +287,7 @@ OBJ builtinCar(int numArgs){
 //------------------------
 OBJ builtinCdr(int numArgs){
 	if(numArgs != 1){
-		return newYbError("biultin (cdr): excepts one argument");
+		return newYbError("biultin (cdr): expects one argument");
 	}
 	OBJ obj = popFromEvalStack();
 	if(TYPE(obj) == T_CONS){
@@ -394,7 +394,7 @@ OBJ builtinLambda(OBJ env, OBJ objList){
 OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 
 	if(TYPE(listOfArguments) != T_CONS){
-		return newYbError("builtin (define): excepts at least two arguments");
+		return newYbError("builtin (define): expects at least two arguments");
 	}
 
 	OBJ firstObj = FIRST(listOfArguments);
@@ -406,9 +406,9 @@ OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 			if(REST(secondObj) == globalNil){
 				//new binding in env
 				envAdd(env, addToSymbolTable(firstObj->u.symbol.name), ybEval(env, FIRST(secondObj)));
-				return globalNil; //todo return globalVoid
+				return globalVoid;
 			}
-			return newYbError("builtin (define): excepts two arguments");
+			return newYbError("builtin (define): expects two arguments");
 		case T_CONS:
 		{
 			OBJ lambdaArgs = newYbCons(REST(firstObj), secondObj);
@@ -417,7 +417,7 @@ OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 			if(TYPE(udfKey) == T_SYMBOL){
 				if(TYPE(udfValue) == T_USER_FUNCTION){
 					envAdd(env, udfKey, udfValue);
-					return globalNil; //todo return globalVoid
+					return globalVoid;
 				}
 				//forward error
 				return udfValue;
@@ -428,5 +428,27 @@ OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 			//error
 			return newYbError("builtin (define); error");
 	}
+}
+
+//------------------------
+// quote
+//------------------------
+OBJ builtinQuote(OBJ env, OBJ listOfArguments) {
+
+	if(TYPE(listOfArguments) != T_CONS){
+		return newYbError("builtin (quote): expects exactly one argument");
+	}
+
+	OBJ obj = FIRST(listOfArguments);
+	OBJ restArgs = REST(listOfArguments);
+	if(restArgs != globalNil){
+		return newYbError("builtin (quote): expects exactly one argument");
+	}
+
+	//free listOfArguments
+	FIRST(listOfArguments) = globalNil;
+	freeObject(listOfArguments);
+
+	return obj;
 }
 
