@@ -11,33 +11,36 @@ Scheme interpreter written in C
 - lists (cons)
 - strings
 - numbers, positive and negative
--- decimal
--- binary
--- octal
--- hexadecimal
--- true, false, nil, void
--- symbol
+ - decimal
+ - binary
+ - octal
+ - hexadecimal
+ - true, false, nil, void
+ - symbol
+ 
 Other features in reader:
 - unread char stack
 - ignore comments
+
 ###eval:
 - builtin functions
--- +
--- -
--- *
--- /
--- eq?
--- =
--- eqv?
--- not
--- cons
--- car
--- cdr
+ - +
+ - -
+ - *
+ - /
+ - eq?
+ - =
+ - eqv?
+ - not
+ - cons
+ - car
+ - cdr
 - builtin syntax
--- quote
--- if
--- lambda
--- define
+ - quote
+ - if
+ - lambda
+ - define
+ 
 Other features in eval:
 - 
 
