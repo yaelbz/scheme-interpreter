@@ -1,8 +1,6 @@
 /*
  * printer.c
- *
- *  Created on: 29.09.2016
- *      Author: yael
+ * repl --> printer
  */
 
 #include <stdio.h>
@@ -31,11 +29,6 @@ cons
                +-int(6)
                +-NULL  !!remove me!!
  */
-
-
-
-
-
 
 
 
@@ -101,8 +94,62 @@ void ybPrintIndent(int indentCount, char* prefix, OBJ obj) {
 	free(indentString);
 }
 
+void ybPrintRacketStyle(OBJ obj){
+	if(obj){
+		switch (obj->u.any.type) {
+		case T_ERROR:
+			printf("## ERROR ## %s\n", obj->u.error.message);
+			break;
+		case T_NIL:
+			printf("'()\n");
+			break;
+		case T_VOID:
+			//do nothing
+			break;
+		case T_TRUE:
+			printf("#t\n");
+			break;
+		case T_FALSE:
+			printf("#f\n");
+			break;
+		case T_NUMBER:
+			if(obj->u.number.isInteger) {
+				printf("%ld\n", obj->u.number.value.i);
+			} else {
+				printf("%f\n", obj->u.number.value.f);
+			}
+			break;
+		case T_STRING:
+			printf("\"%s\"\n", obj->u.string.string);
+			break;
+		case T_SYMBOL:
+			printf("TODO: return binding or error msg if not exists. %s\n", obj->u.symbol.name);
+			break;
+		case T_BUILTIN_FUNCTION:
+			printf("#<procedure:%s>\n", obj->u.builtinFct.name);
+			break;
+		case T_USER_FUNCTION:
+			printf("#<procedure>\n");
+			break;
+		case T_CONS:
+			printf("cons: ");
+			ybPrintRacketStyle(FIRST(obj));
+			ybPrintRacketStyle(REST(obj));
+			break;
+		default:
+			printf("this object cant be printed. type: %d\n", TYPE(obj));
+			break;
+			}
+	}
+	else {
+
+	}
+
+}
+
 
 void ybPrint(OBJ obj) {
-	ybPrintIndent(0, "", obj);
+	//ybPrintIndent(0, "", obj);
+	ybPrintRacketStyle(obj);
 }
 

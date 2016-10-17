@@ -12,7 +12,7 @@
 
 int main(){
 
-	printf("Hallöle!\n");
+	printf("Welcome to ybscheme!\n");
 
 	initGlobals();
 	initReader();
@@ -20,7 +20,7 @@ int main(){
 
 	//repl
 	while(1){
-		printf("yscm> ");
+		printf("> ");
 		fflush(stdout);
 		//read
 		OBJ readObj = ybRead(stdin);

@@ -43,8 +43,6 @@ void initBuiltins(){
 	envAdd(NULL, addToSymbolTable("if"),	newYbBuiltinSyntax("if",	&builtinIf));
 	envAdd(NULL, addToSymbolTable("quote"),	newYbBuiltinSyntax("quote",	&builtinQuote));
 
-
-	//quote
 }
 
 //------------------------
