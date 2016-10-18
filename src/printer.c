@@ -101,7 +101,8 @@ void ybPrintRacketStyle(OBJ obj){
 			printf("## ERROR ## %s\n", obj->u.error.message);
 			break;
 		case T_NIL:
-			printf("'()\n");
+			//printf("'()\n");
+			printf("nil\n");
 			break;
 		case T_VOID:
 			//do nothing
@@ -129,7 +130,7 @@ void ybPrintRacketStyle(OBJ obj){
 			printf("#<procedure:%s>\n", obj->u.builtinFct.name);
 			break;
 		case T_USER_FUNCTION:
-			printf("#<procedure>\n");
+			printf("#<procedure:%s>\n", obj->u.userFct.name);
 			break;
 		case T_CONS:
 			printf("cons: ");
@@ -149,7 +150,7 @@ void ybPrintRacketStyle(OBJ obj){
 
 
 void ybPrint(OBJ obj) {
-	//ybPrintIndent(0, "", obj);
-	ybPrintRacketStyle(obj);
+	ybPrintIndent(0, "", obj);
+	//ybPrintRacketStyle(obj);
 }
 

@@ -404,9 +404,15 @@ OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 		case T_SYMBOL:
 			//when first Obj is a symbol, there must be only one more object
 			if(REST(secondObj) == globalNil){
-				//new binding in env
-				envAdd(env, addToSymbolTable(firstObj->u.symbol.name), ybEval(env, FIRST(secondObj)));
-				return globalVoid;
+				OBJ evaluatedObj = ybEval(env, FIRST(secondObj));
+				if(TYPE(evaluatedObj) == T_USER_FUNCTION){
+					evaluatedObj->u.userFct.name = firstObj->u.symbol.name;
+				}
+				if(TYPE(evaluatedObj) != T_ERROR){
+					//new binding in env
+					envAdd(env, addToSymbolTable(firstObj->u.symbol.name), evaluatedObj);
+					return globalVoid;
+				}
 			}
 			return newYbError("builtin (define): expects two arguments");
 		case T_CONS:
@@ -416,6 +422,7 @@ OBJ builtinDefine(OBJ env, OBJ listOfArguments){
 			OBJ udfKey = FIRST(firstObj);
 			if(TYPE(udfKey) == T_SYMBOL){
 				if(TYPE(udfValue) == T_USER_FUNCTION){
+					udfValue->u.userFct.name = udfKey->u.symbol.name;
 					envAdd(env, udfKey, udfValue);
 					return globalVoid;
 				}

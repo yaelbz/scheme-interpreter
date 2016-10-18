@@ -46,6 +46,7 @@ Other features in eval:
 
 ##Issues
 - float
+- bool
 - file stream
 - error handling
 -- handle memory

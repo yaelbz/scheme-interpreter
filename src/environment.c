@@ -144,6 +144,7 @@ OBJ globalEnvGet(OBJ key){
 		if(storedKey == NULL){
 			//key does not exist in env
 			return globalNil;
+			//todo maybe return undefined instead?
 		}
 		searchIndex = (searchIndex + 1) % globalEnv->u.environment.size;
 		if (searchIndex == startIndex) {

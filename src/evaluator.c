@@ -119,8 +119,7 @@ OBJ ybEvalCons(OBJ env, OBJ obj){
 		return returnValue;
 	}
 	default:
-		//was passiert hier genau? welche Fälle könnte es noch geben?
-		//frage wenn das erste symbol in der Liste eine variable ist und kein "ausführbares" symbol dann gibt das n fehler, oder?
+		//todo maybe return undefined instead?
 		return globalNil;
 	}
 	// never reached
