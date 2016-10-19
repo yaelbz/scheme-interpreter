@@ -161,7 +161,7 @@ int ybReadNumberSign(int *ch, FILE* inputStream, isDigitPtr isDigitFct) {
 	if(*ch == '-') {
 		sign = -1;
 		*ch = getNextRelevantChar(inputStream);
-		// this is not a number, maybe a symbol
+		//this is not a number, maybe a symbol
 		if(!isDigitFct(*ch)) {
 			pushCharBack(*ch);
 			pushCharBack('-');
@@ -169,7 +169,7 @@ int ybReadNumberSign(int *ch, FILE* inputStream, isDigitPtr isDigitFct) {
 		}
 	} else if(*ch == '+') {
 		*ch = getNextRelevantChar(inputStream);
-		// this is not a number, maybe a symbol
+		//this is not a number, maybe a symbol
 		if(!isDigitFct(*ch)) {
 			pushCharBack(*ch);
 			pushCharBack('+');

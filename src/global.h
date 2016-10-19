@@ -15,19 +15,19 @@
 //--- types of objects ---//
 
 typedef enum {
-	T_ERROR=-1,
-	T_NIL=0,
-	T_VOID,
-	T_TRUE,
-	T_FALSE,
-	T_NUMBER,
-	T_STRING,
-	T_SYMBOL,
-	T_CONS,
-	T_BUILTIN_FUNCTION,
-	T_BUILTIN_SYNTAX,
-	T_USER_FUNCTION,
-	T_ENVIRONMENT,
+	T_ERROR=-1,				//-1
+	T_NIL=0,				//0
+	T_VOID,					//1
+	T_TRUE,					//2
+	T_FALSE,				//3
+	T_NUMBER,				//4
+	T_STRING,				//5
+	T_SYMBOL,				//6
+	T_CONS,					//7
+	T_BUILTIN_FUNCTION,		//8
+	T_BUILTIN_SYNTAX,		//9
+	T_USER_FUNCTION,		//10
+	T_ENVIRONMENT,			//11
 }objType;
 
 //--- object definitions ---//

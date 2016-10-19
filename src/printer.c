@@ -22,12 +22,12 @@ cons
          |  +-int(3)
          |  +-cons
          |     +-int(4)
-         |     +-NULL  !!remove me!!
+         |     +-nil
          +-cons
             +-int(5)
             +-cons
                +-int(6)
-               +-NULL  !!remove me!!
+               +-nil
  */
 
 
@@ -98,47 +98,56 @@ void ybPrintRacketStyle(OBJ obj){
 	if(obj){
 		switch (obj->u.any.type) {
 		case T_ERROR:
-			printf("## ERROR ## %s\n", obj->u.error.message);
+			printf("## ERROR ## %s", obj->u.error.message);
 			break;
 		case T_NIL:
 			//printf("'()\n");
-			printf("nil\n");
+			printf("nil");
 			break;
 		case T_VOID:
 			//do nothing
 			break;
 		case T_TRUE:
-			printf("#t\n");
+			printf("#t");
 			break;
 		case T_FALSE:
-			printf("#f\n");
+			printf("#f");
 			break;
 		case T_NUMBER:
 			if(obj->u.number.isInteger) {
-				printf("%ld\n", obj->u.number.value.i);
+				printf("%ld", obj->u.number.value.i);
 			} else {
-				printf("%f\n", obj->u.number.value.f);
+				printf("%f", obj->u.number.value.f);
 			}
 			break;
 		case T_STRING:
-			printf("\"%s\"\n", obj->u.string.string);
+			printf("\"%s\"", obj->u.string.string);
 			break;
 		case T_SYMBOL:
-			printf("TODO: return binding or error msg if not exists. %s\n", obj->u.symbol.name);
+			printf("'%s", obj->u.symbol.name);
 			break;
 		case T_BUILTIN_FUNCTION:
-			printf("#<procedure:%s>\n", obj->u.builtinFct.name);
+			printf("#<procedure:%s>", obj->u.builtinFct.name);
 			break;
 		case T_USER_FUNCTION:
-			printf("#<procedure:%s>\n", obj->u.userFct.name);
+			printf("#<procedure:%s>", obj->u.userFct.name);
 			break;
 		case T_CONS:
-			printf("cons: ");
+			printf("(");
 			ybPrintRacketStyle(FIRST(obj));
-			ybPrintRacketStyle(REST(obj));
+			while(TYPE(REST(obj)) == T_CONS) {
+				printf(" ");
+				obj = REST(obj);
+				ybPrintRacketStyle(FIRST(obj));
+			}
+			if(REST(obj)!=globalNil) {
+				printf(" . ");
+				ybPrintRacketStyle(REST(obj));
+			}
+			printf(")");
 			break;
 		default:
-			printf("this object cant be printed. type: %d\n", TYPE(obj));
+			printf("this object cant be printed. type: %d", TYPE(obj));
 			break;
 			}
 	}
@@ -150,7 +159,9 @@ void ybPrintRacketStyle(OBJ obj){
 
 
 void ybPrint(OBJ obj) {
-	ybPrintIndent(0, "", obj);
-	//ybPrintRacketStyle(obj);
+	//ybPrintIndent(0, "", obj);
+	ybPrintRacketStyle(obj);
+	printf("\n");
+	fflush(stdout);
 }
 

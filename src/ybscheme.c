@@ -33,8 +33,5 @@ int main(){
 		}
 	}
 
-	//todo: clean up free memory - durch sig9
-
-
 	return 0;
 }

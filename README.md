@@ -1,6 +1,10 @@
 # ybscheme
 
-Scheme interpreter written in C
+Scheme simple interpreter written in C
+
+Made with
+- Eclipse 
+-
 
 ##Setup
 - compile with -std=c99
@@ -45,10 +49,19 @@ Other features in eval:
 - 
 
 ##Issues
-- float
 - bool
 - file stream
+- detect incorrect user input, e.g. closing bracket without opening first
+- better feedback
+ - concrete undefined message
+- more number types
+ - float
+ - sqrt
+ - sin, cos, tan
+- more builtins
+ - list
+ - equal?
 - error handling
--- handle memory
--- errorNums in enum
+ - handle memory
+ - errorNums in enum
 -- return to main execution

@@ -193,12 +193,15 @@ OBJ newYbEnvironment(int envSize, OBJ parentEnv){
 // #### free object #######################################################################################
 
 void freeObject(OBJ obj){
+	//printf("#### free: %d ####\n", TYPE(obj));
 	switch (TYPE(obj)) {
 	case T_ERROR:
 	case T_NIL:
 	case T_VOID:
 	case T_TRUE:
 	case T_FALSE:
+	case T_BUILTIN_FUNCTION:
+	case T_BUILTIN_SYNTAX:
 		break;
 	case T_CONS:
 		freeObject(FIRST(obj));
