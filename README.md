@@ -1,13 +1,14 @@
+# DEPRECATED!!!
+see here: https://github.com/yaelbz/ybscheme
+
+
+--------
 # ybscheme
 
 Scheme simple interpreter written in C
 
 Made with
 - Eclipse 
--
-
-##Setup
-- compile with -std=c99
 
 ##Features
 ###read:
